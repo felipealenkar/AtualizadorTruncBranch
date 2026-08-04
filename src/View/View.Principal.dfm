@@ -8608,6 +8608,7 @@ object FrmPrincipal: TFrmPrincipal
       Margins.Bottom = 13
       Align = alClient
       ReadOnly = True
+      ScrollBars = ssVertical
       TabOrder = 0
     end
   end

@@ -69,7 +69,7 @@ const
   BRANCHES_FAVORITAS_SHOP: string = 'BRANCHES_SHOP';
   BRANCHES_FAVORITAS_PDV: string = 'BRANCHES_PDV';
 
-  DIRETORIO_BRANCHES: string = 'C:\Projects\AtualizadorTruncBranch\Win64\Debug\'; //G:\ALTERDAT\Versoes\wshop\Hudson\branches\
+  DIRETORIO_BRANCHES: string = 'G:\ALTERDAT\Versoes\wshop\Hudson\branches\';
 
 implementation
 
@@ -94,6 +94,7 @@ begin
   LArquivoIni := nil;
   try
     LArquivoIni := TIniFile.Create(LCaminhoIni);
+    LArquivoIni.EraseSection(PTipoBranch);
 
     for I := 0 to LbxBranches.Items.Count -1 do
       LArquivoIni.WriteString(PTipoBranch, 'Branch_' + I.ToString, LbxBranches.Items.Strings[I]);
@@ -243,8 +244,6 @@ begin
     try
       SetHandleInformation(LStdOutRead, HANDLE_FLAG_INHERIT, 0);
 
-      // stdin apontando pro NUL: se o .bat tiver "pause", ele recebe EOF na
-      // hora e não fica esperando tecla pra sempre (o que travava a tela)
       LStdInNul := CreateFile('NUL', GENERIC_READ, FILE_SHARE_READ or FILE_SHARE_WRITE,
         @LSaAttr, OPEN_EXISTING, 0, 0);
       if LStdInNul = INVALID_HANDLE_VALUE then
@@ -258,7 +257,6 @@ begin
       LStartupInfo.hStdError := LStdOutWrite;
       LStartupInfo.hStdInput := LStdInNul;
 
-      // /c fecha o cmd sozinho ao terminar o .bat
       if PNomeBranch = EmptyStr then
         LComando := Format('cmd.exe /c "%s"', [PCaminhoBat])
       else
@@ -276,22 +274,64 @@ begin
       LStdOutWrite := 0;
 
       LLinhaPendente := '';
-      repeat
-        if not ReadFile(LStdOutRead, LBuffer, BUFFER_SIZE, LBytesRead, nil) or (LBytesRead = 0) then
-          Break;
 
-        SetString(LTexto, LBuffer, LBytesRead);
-        LLinhaPendente := LLinhaPendente + LTexto;
+     // ===== INÍCIO DA PARTE CORRIGIDA PARA PROGRESSO / PORCENTAGEM =====
+      SendMessage(mmoMemoLog.Handle, WM_SETREDRAW, 0, 0);
+      try
+        repeat
+          if not ReadFile(LStdOutRead, LBuffer, BUFFER_SIZE, LBytesRead, nil) or (LBytesRead = 0) then
+            Break;
 
-        LPos := Pos(UTF8String(#13#10), LLinhaPendente);
-        while LPos > 0 do
-        begin
-          AdicionarLog(Trim(UTF8ToString(Copy(LLinhaPendente, 1, LPos - 1))));
-          Delete(LLinhaPendente, 1, LPos + 1);
-          LPos := Pos(UTF8String(#13#10), LLinhaPendente);
-          Application.ProcessMessages; // simples: mantém a UI respondendo durante a execução
-        end;
-      until False;
+          SetString(LTexto, LBuffer, LBytesRead);
+          LLinhaPendente := LLinhaPendente + LTexto;
+
+          // Processa enquanto houver quebras de linha normais (#13#10) ou retornos de carro (#13)
+          while True do
+          begin
+            LPos := Pos(UTF8String(#13#10), LLinhaPendente);
+
+            if LPos = 0 then
+              LPos := Pos(UTF8String(#13), LLinhaPendente); // Apenas o retorno de carro do progresso
+
+            if LPos = 0 then
+              Break;
+
+            LTextoRestante := Trim(UTF8ToString(Copy(LLinhaPendente, 1, LPos - 1)));
+
+            // Remove o delimitador processado da string pendente
+            if (LPos + 1 <= Length(LLinhaPendente)) and (LLinhaPendente[LPos] = #13) and (LLinhaPendente[LPos+1] = #10) then
+              Delete(LLinhaPendente, 1, LPos + 1)
+            else
+              Delete(LLinhaPendente, 1, LPos);
+
+            if LTextoRestante <> '' then
+            begin
+              // Se a linha atual e a última linha do Memo contiverem '%',
+              // significa que é uma barra de progresso em andamento. Substituímos em vez de criar nova linha.
+              if (mmoMemoLog.Lines.Count > 0) and
+                 (Pos('%', mmoMemoLog.Lines[mmoMemoLog.Lines.Count - 1]) > 0) and
+                 (Pos('%', LTextoRestante) > 0) then
+              begin
+                mmoMemoLog.Lines[mmoMemoLog.Lines.Count - 1] := LTextoRestante;
+              end
+              else
+              begin
+                AdicionarLog(LTextoRestante);
+              end;
+            end;
+          end;
+
+          SendMessage(mmoMemoLog.Handle, WM_SETREDRAW, 1, 0);
+          mmoMemoLog.Invalidate;
+          SendMessage(mmoMemoLog.Handle, EM_SCROLLCARET, 0, 0);
+          Application.ProcessMessages;
+          SendMessage(mmoMemoLog.Handle, WM_SETREDRAW, 0, 0);
+        until False;
+      finally
+        SendMessage(mmoMemoLog.Handle, WM_SETREDRAW, 1, 0);
+        mmoMemoLog.Invalidate;
+      end;
+      // ===== FIM DA PARTE CORRIGIDA =====
 
       LTextoRestante := Trim(UTF8ToString(LLinhaPendente));
       if LTextoRestante <> '' then
@@ -391,13 +431,29 @@ begin
   Resposta := MessageBox(Self.Handle, 'Deseja limpar todas as Branches?', 'Limpar Branches', MB_YESNO or MB_ICONQUESTION);
 
   if Resposta = IDYES then
+  begin
     LbxBranches.Items.Clear;
+
+    if (CbbSistema.Items.Strings[CbbSistema.ItemIndex] = SISTEMA_ISHOP_WSHOP) or
+       (CbbSistema.Items.Strings[CbbSistema.ItemIndex] = SISTEMA_SHOP_SIMPLES) then
+      GravarBranchesFavoritas(BRANCHES_FAVORITAS_SHOP)
+    else if CbbSistema.Items.Strings[CbbSistema.ItemIndex] = SISTEMA_PDV_Alterdata then
+      GravarBranchesFavoritas(BRANCHES_FAVORITAS_PDV);
+  end;
 end;
 
 procedure TFrmPrincipal.BtnRemoverBranchClick(Sender: TObject);
 begin
   if LbxBranches.ItemIndex <> -1 then
+  begin
     LbxBranches.Items.Delete(LbxBranches.ItemIndex);
+
+    if (CbbSistema.Items.Strings[CbbSistema.ItemIndex] = SISTEMA_ISHOP_WSHOP) or
+       (CbbSistema.Items.Strings[CbbSistema.ItemIndex] = SISTEMA_SHOP_SIMPLES) then
+      GravarBranchesFavoritas(BRANCHES_FAVORITAS_SHOP)
+    else if CbbSistema.Items.Strings[CbbSistema.ItemIndex] = SISTEMA_PDV_Alterdata then
+      GravarBranchesFavoritas(BRANCHES_FAVORITAS_PDV);
+  end;
 end;
 
 procedure TFrmPrincipal.CarregarBranchesFavoritas(PTipoBranch: string);
