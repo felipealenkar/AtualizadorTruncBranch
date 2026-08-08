@@ -1,7 +1,23 @@
 @echo off
 chcp 65001 > nul
-title Atualização da Trunc PDV com Robocopy
+title Atualização da Trunk PDV com Robocopy
 color 0A
+
+:: -------------------------------------------------------------------------
+:: VALIDAÇÃO DO PARÂMETRO DA LIB SHOP
+:: -------------------------------------------------------------------------
+if "%~1"=="" (
+    color 0C
+    echo ====================================================================================================
+    echo ❌ ERRO: NOME DA LIB SHOP NAO FOI INFORMADO!
+    echo ====================================================================================================
+    echo.
+    echo Uso: TrunkPDV.bat "NomeLib"
+    echo.
+    pause >nul
+    exit /b 1
+)
+set "NOME_LIB=%~1"
 
 :: -------------------------------------------------------------------------
 :: VERIFICAÇÃO RIGOROSA DE ADMINISTRADOR
@@ -16,7 +32,7 @@ if %errorlevel% neq 0 (
     echo Como a sua empresa possui bloqueios de rede, siga estes passos:
     echo.
     echo 1. Feche esta janela preta.
-    echo 2. Clique com o BOTAO DIREITO no arquivo "TruncPDV.bat".
+    echo 2. Clique com o BOTAO DIREITO no arquivo "TrunkPDV.bat".
     echo 3. Escolha a opcao "Executar como Administrador".
     echo.
     pause >nul
@@ -24,7 +40,7 @@ if %errorlevel% neq 0 (
 )
 
 echo ========================================================================================================
-echo             INICIANDO ATUALIZAÇÃO DA TRUNC PDV
+echo             INICIANDO ATUALIZAÇÃO DA TRUNK PDV
 echo ========================================================================================================
 echo.
 
@@ -75,6 +91,29 @@ set "DESTINO14=C:\Program Files (x86)\Alterdata\PDV Alterdata\Lays\DanfeNFCe"
 set "ORIGEM15=G:\ALTERDAT\Versoes\wshop\Hudson\trunk\PdvAlterdata\Lays\Alexandria\Rtm_Venda_Futura"
 set "DESTINO15=C:\Program Files (x86)\Alterdata\PDV Alterdata\Lays\VendaFutura"
 
+:: -------------------------------------------------------------------------
+:: CAMINHOS CONDICIONAIS - (dependem do parâmetro da branch)
+:: -------------------------------------------------------------------------
+
+if /I "%NOME_LIB%"=="Trunk Atual" (
+    set "ORIGEM_OP1=G:\ALTERDAT\Versoes\wshop\Hudson\trunk\BPL\Tokyo\Alterdata"
+    set "DESTINO_OP1=C:\Program Files (x86)\Alterdata\Biblioteca"
+
+    set "ORIGEM_OP2=G:\ALTERDAT\Versoes\wshop\Hudson\trunk\BPL\Tokyo\SHOP"
+    set "DESTINO_OP2=C:\Program Files (x86)\Alterdata\Biblioteca"
+) else (
+    set "ORIGEM_OP1=G:\ALTERDAT\Versoes\wshop\Hudson\branches\%NOME_LIB%_FULL\BPL\Tokyo\Alterdata"
+    set "DESTINO_OP1=C:\Program Files (x86)\Alterdata\Biblioteca"
+
+    set "ORIGEM_OP2=G:\ALTERDAT\Versoes\wshop\Hudson\branches\%NOME_LIB%_FULL\BPL\Tokyo\Shop"
+    set "DESTINO_OP2=C:\Program Files (x86)\Alterdata\Biblioteca"
+
+    set "ORIGEM_OP3=G:\ALTERDAT\Versoes\wshop\Hudson\branches\%NOME_LIB%\BPL\Tokyo\Alterdata"
+    set "DESTINO_OP3=C:\Program Files (x86)\Alterdata\Biblioteca"
+
+    set "ORIGEM_OP4=G:\ALTERDAT\Versoes\wshop\Hudson\branches\%NOME_LIB%\BPL\Tokyo\Shop"
+    set "DESTINO_OP4=C:\Program Files (x86)\Alterdata\Biblioteca"
+)
 
 echo ==========================================================================
 echo VALIDAÇÃO DAS PASTAS DE ORIGEM
@@ -101,6 +140,11 @@ call :VERIFICAR_PASTA "%ORIGEM12%" "%ORIGEM12%"
 call :VERIFICAR_PASTA "%ORIGEM13%" "%ORIGEM13%"
 call :VERIFICAR_PASTA "%ORIGEM14%" "%ORIGEM14%"
 call :VERIFICAR_PASTA "%ORIGEM15%" "%ORIGEM15%"
+
+call :VERIFICAR_PASTA_OPCIONAL "%ORIGEM_OP1%" "ORIGEM_OP1"
+call :VERIFICAR_PASTA_OPCIONAL "%ORIGEM_OP2%" "ORIGEM_OP2"
+if defined ORIGEM_OP3 call :VERIFICAR_PASTA_OPCIONAL "%ORIGEM_OP3%" "ORIGEM_OP3"
+if defined ORIGEM_OP4 call :VERIFICAR_PASTA_OPCIONAL "%ORIGEM_OP4%" "ORIGEM_OP4"
 
 :: Se houve algum erro em qualquer pasta, para o script aqui
 if "%ERRO_PASTA%"=="1" (
@@ -193,6 +237,33 @@ echo 📁 Copiando para VendaFutura...
 robocopy "%ORIGEM15%" "%DESTINO15%" /E /ZB /R:1 /W:2 /NJH /NJS /NDL /XX /FFT
 if errorlevel 8 goto ERRO
 
+::-----------------------------------------------------------------------------------------------------------
+:: Cópia dos arquivos da Lib Shop
+::-----------------------------------------------------------------------------------------------------------
+
+if "%ORIGEM_OP1_OK%"=="1" (
+	echo 📁 Copiando para Biblioteca...
+	robocopy "%ORIGEM_OP1%" "%DESTINO_OP1%" /E /ZB /R:1 /W:2 /NJH /NJS /NDL /XX /FFT /XF "AltShopProc_IntegracaoOrcamentoPDALogicalAFV.exe" /XD "dcp_Alexandria" "dcp" "dcp_Tokyo" "dcus"
+	if errorlevel 8 goto ERRO
+)
+
+if "%ORIGEM_OP2_OK%"=="1" (
+	echo 📁 Copiando para Biblioteca...
+	robocopy "%ORIGEM_OP2%" "%DESTINO_OP2%" /E /ZB /R:1 /W:2 /NJH /NJS /NDL /XX /FFT /XD "dcp_Alexandria" "DCP"
+	if errorlevel 8 goto ERRO
+)
+
+if "%ORIGEM_OP3_OK%"=="1" (
+	echo 📁 Copiando para Biblioteca...
+	robocopy "%ORIGEM_OP3%" "%DESTINO_OP3%" /E /ZB /R:1 /W:2 /NJH /NJS /NDL /XX /FFT /XF "AltShopProc_IntegracaoOrcamentoPDALogicalAFV.exe" /XD "dcp_Alexandria" "dcp" "dcp_Tokyo" "dcus"
+	if errorlevel 8 goto ERRO
+)
+
+if "%ORIGEM_OP4_OK%"=="1" (
+	echo 📁 Copiando para Biblioteca...
+	robocopy "%ORIGEM_OP4%" "%DESTINO_OP4%" /E /ZB /R:1 /W:2 /NJH /NJS /NDL /XX /FFT /XD "dcp_Alexandria" "DCP"
+	if errorlevel 8 goto ERRO
+)
 :: Se chegou aqui, deu tudo certo!
 goto SUCESSO
 
@@ -211,6 +282,16 @@ if not exist "%~1" (
     set "ERRO_PASTA=1"
 ) else (
     echo  [OK] Pasta encontrada       📁 "%~2" .
+)
+goto :eof
+
+:VERIFICAR_PASTA_OPCIONAL
+if not exist "%~1" (
+    echo ⚠️ [IGNORADA] Pasta não encontrada       ▶️ %~1
+    set "%~2_OK=0"
+) else (
+    echo  [OK] Pasta encontrada       📁 %~1
+    set "%~2_OK=1"
 )
 goto :eof
 ::FUNÇÕES DECLARADAS - FIM

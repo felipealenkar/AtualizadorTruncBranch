@@ -14,32 +14,34 @@ type
     mmoMemoLog: TMemo;
     PnlFiltros: TPanel;
     LblSistema: TLabel;
-    LblBranch: TLabel;
+    LblBranchLib: TLabel;
     CbbSistema: TComboBox;
     BtnAtualizar: TButton;
     RgCompilacao: TRadioGroup;
-    LbxBranches: TListBox;
-    BtnAdicionarBranch: TButton;
+    LbxVersoes: TListBox;
+    BtnAdicionarVersao: TButton;
     VImgLImagensMenores: TVirtualImageList;
-    BtnRemoverBranch: TButton;
-    BtnLimparBranches: TButton;
+    BtnRemoverVersao: TButton;
+    BtnLimparVersoes: TButton;
     PnlLog: TPanel;
     procedure BtnAtualizarClick(Sender: TObject);
     procedure RgCompilacaoClick(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure CbbSistemaChange(Sender: TObject);
-    procedure BtnAdicionarBranchClick(Sender: TObject);
-    procedure BtnRemoverBranchClick(Sender: TObject);
-    procedure BtnLimparBranchesClick(Sender: TObject);
+    procedure BtnAdicionarVersaoClick(Sender: TObject);
+    procedure BtnRemoverVersaoClick(Sender: TObject);
+    procedure BtnLimparVersoesClick(Sender: TObject);
   private
+    FSistemaEscolhido: string;
+    FCompilacaoEscolhida: string;
     FNomeArquivoBat: string;
-    FBuscaBranches: string;
+    FBuscaVersoes: string;
+
 
     procedure AdicionarLog(const PLinha: string);
-    procedure CarregarBranchesFavoritas(PTipoBranch: string);
+    procedure CarregarVersoesFavoritas(PTipoVersao: string);
     procedure ExecutarBat(const PCaminhoBat: string; const PNomeBranch: string = ''; const PVersaoBranch: string = '');
-    function ExtrairVersaoBranch(const PNomeBranch: string): string;
-    procedure GravarBranchesFavoritas(PTipoBranch: string);
+    procedure GravarVersoesFavoritas(PTipoBranch: string);
     procedure IniciarComponentesVisuais;
     procedure ModificarComponentes;
     procedure TravarUI(PTravado: Boolean);
@@ -54,27 +56,28 @@ var
 const
   BAT_ENCERRA_PROC: string = 'EncerraProc.bat';
 
-  BAT_TRUNC_SHOP: string = 'TruncShop.bat';
-  BAT_TRUNC_SHOP_SIMPLES: string = 'TruncShopSimples.bat';
-  BAT_TRUNC_PDV: string = 'TruncPDV.bat';
+  BAT_TRUNK_SHOP: string = 'TrunkShop.bat';
+  BAT_TRUNK_SHOP_SIMPLES: string = 'TrunkShopSimples.bat';
+  BAT_TRUNK_PDV: string = 'TrunkPDV.bat';
 
   BAT_BRANCH_SHOP: string = 'BranchShop.bat';
   BAT_BRANCH_SHOP_SIMPLES: string = 'BranchShopSimples.bat';
   BAT_BRANCH_PDV: string = 'BranchPDV.bat';
 
+  BRANCHES_FAVORITAS_SHOP: string = 'BRANCHES_SHOP';
+  BRANCHES_FAVORITAS_PDV: string = 'BRANCHES_PDV';
+  LIBS_FAVORITAS_SHOP_PDV: string = 'LIBS_PDV';
+
   SISTEMA_ISHOP_WSHOP: string = 'Ishop/WShop';
   SISTEMA_SHOP_SIMPLES: string = 'Shop Simples';
   SISTEMA_PDV_Alterdata: string = 'PDV Alterdata';
 
-  BRANCHES_FAVORITAS_SHOP: string = 'BRANCHES_SHOP';
-  BRANCHES_FAVORITAS_PDV: string = 'BRANCHES_PDV';
-
-  DIRETORIO_BRANCHES: string = 'G:\ALTERDAT\Versoes\wshop\Hudson\branches\';
+  DIRETORIO_BRANCHES: string = 'C:\Projects\AtualizadorTrunkBranch\Win64\Debug\'; //'G:\ALTERDAT\Versoes\wshop\Hudson\branches\';
 
 implementation
 
 uses
-  System.RegularExpressions,
+  Utils.Funcoes,
   View.Branches;
 
 {$R *.dfm}
@@ -84,20 +87,20 @@ begin
   IniciarComponentesVisuais;
 end;
 
-procedure TFrmPrincipal.GravarBranchesFavoritas(PTipoBranch: string);
+procedure TFrmPrincipal.GravarVersoesFavoritas(PTipoBranch: string);
 var
   LArquivoIni: TIniFile;
   LCaminhoIni: string;
   I: Integer;
 begin
-  LCaminhoIni := TPath.Combine(TPath.GetDirectoryName(ParamStr(0)), 'BranchesFavoritas.ini');
+  LCaminhoIni := TPath.Combine(TPath.GetDirectoryName(ParamStr(0)), 'VersoesFavoritas.ini');
   LArquivoIni := nil;
   try
     LArquivoIni := TIniFile.Create(LCaminhoIni);
     LArquivoIni.EraseSection(PTipoBranch);
 
-    for I := 0 to LbxBranches.Items.Count -1 do
-      LArquivoIni.WriteString(PTipoBranch, 'Branch_' + I.ToString, LbxBranches.Items.Strings[I]);
+    for I := 0 to LbxVersoes.Items.Count -1 do
+      LArquivoIni.WriteString(PTipoBranch, 'Branch_' + I.ToString, LbxVersoes.Items.Strings[I]);
   finally
     LArquivoIni.Free;
   end;
@@ -109,6 +112,10 @@ begin
   CbbSistema.Items.Add(SISTEMA_SHOP_SIMPLES);
   CbbSistema.Items.Add(SISTEMA_PDV_Alterdata);
   RgCompilacao.ItemIndex := 0;
+  CbbSistema.ItemIndex := 0;
+  FSistemaEscolhido := CbbSistema.Items.Strings[CbbSistema.ItemIndex];
+  FCompilacaoEscolhida := RgCompilacao.Items.Strings[RgCompilacao.ItemIndex];
+  ModificarComponentes;
   mmoMemoLog.Clear;
 end;
 
@@ -118,46 +125,77 @@ begin
 
   if RgCompilacao.ItemIndex = 0 then
   begin
-    LbxBranches.Enabled := False;
-    BtnAdicionarBranch.Enabled := False;
-    BtnRemoverBranch.Enabled := False;
-    BtnLimparBranches.Enabled := False;
-    LbxBranches.ItemIndex := -1;
-
-    if CbbSistema.Items.Strings[CbbSistema.ItemIndex] = SISTEMA_ISHOP_WSHOP then
-      FNomeArquivoBat := BAT_TRUNC_SHOP
-    else if CbbSistema.Items.Strings[CbbSistema.ItemIndex] = SISTEMA_SHOP_SIMPLES then
-      FNomeArquivoBat := BAT_TRUNC_SHOP_SIMPLES
-    else if CbbSistema.Items.Strings[CbbSistema.ItemIndex] = SISTEMA_PDV_Alterdata then
-      FNomeArquivoBat := BAT_TRUNC_PDV;
+    if FSistemaEscolhido = SISTEMA_ISHOP_WSHOP then
+    begin
+      LbxVersoes.Enabled := False;
+      BtnAdicionarVersao.Enabled := False;
+      BtnRemoverVersao.Enabled := False;
+      BtnLimparVersoes.Enabled := False;
+      LblBranchLib.Enabled := False;
+      LblBranchLib.Caption := EmptyStr;
+      LbxVersoes.ItemIndex := -1;
+      FNomeArquivoBat := BAT_TRUNK_SHOP;
+      LbxVersoes.Items.Clear;
+    end
+    else if FSistemaEscolhido = SISTEMA_SHOP_SIMPLES then
+    begin
+      LbxVersoes.Enabled := False;
+      BtnAdicionarVersao.Enabled := False;
+      BtnRemoverVersao.Enabled := False;
+      BtnLimparVersoes.Enabled := False;
+      LblBranchLib.Enabled := False;
+      LblBranchLib.Caption := EmptyStr;
+      LbxVersoes.ItemIndex := -1;
+      FNomeArquivoBat := BAT_TRUNK_SHOP_SIMPLES;
+      LbxVersoes.Items.Clear;
+    end
+    else if FSistemaEscolhido = SISTEMA_PDV_Alterdata then
+    begin
+      LbxVersoes.Enabled := True;
+      BtnAdicionarVersao.Enabled := True;
+      BtnRemoverVersao.Enabled := True;
+      BtnLimparVersoes.Enabled := True;
+      LblBranchLib.Enabled := True;
+      LblBranchLib.Caption := 'Versão da Lib Shop compatível';
+      LbxVersoes.ItemIndex := -1;
+      FNomeArquivoBat := BAT_TRUNK_PDV;
+      FBuscaVersoes := 'WSHOP'; //Aqui é Wshop pois queremos a versão da Lib do Wshop mesmo
+      CarregarVersoesFavoritas(LIBS_FAVORITAS_SHOP_PDV);
+    end;
   end
   else if RgCompilacao.ItemIndex = 1 then
   begin
-    LbxBranches.Enabled := True;
-    BtnAdicionarBranch.Enabled := True;
-    BtnRemoverBranch.Enabled := True;
-    BtnLimparBranches.Enabled := True;
+    LbxVersoes.Enabled := True;
+    BtnAdicionarVersao.Enabled := True;
+    BtnRemoverVersao.Enabled := True;
+    BtnLimparVersoes.Enabled := True;
+    LblBranchLib.Enabled := True;
+    LblBranchLib.Caption := 'Versão da Branch';
 
-    if CbbSistema.Items.Strings[CbbSistema.ItemIndex] = SISTEMA_ISHOP_WSHOP then
+    if FSistemaEscolhido = SISTEMA_ISHOP_WSHOP then
     begin
       FNomeArquivoBat := BAT_BRANCH_SHOP;
-      FBuscaBranches := 'WSHOP';
+      FBuscaVersoes := 'WSHOP';
+      CarregarVersoesFavoritas(BRANCHES_FAVORITAS_SHOP);
     end
-    else if CbbSistema.Items.Strings[CbbSistema.ItemIndex] = SISTEMA_SHOP_SIMPLES then
+    else if FSistemaEscolhido = SISTEMA_SHOP_SIMPLES then
     begin
       FNomeArquivoBat := BAT_BRANCH_SHOP_SIMPLES;
-      FBuscaBranches := 'WSHOP';
+      FBuscaVersoes := 'WSHOP';
+      CarregarVersoesFavoritas(BRANCHES_FAVORITAS_SHOP);
     end
-    else if CbbSistema.Items.Strings[CbbSistema.ItemIndex] = SISTEMA_PDV_Alterdata then
+    else if FSistemaEscolhido = SISTEMA_PDV_Alterdata then
     begin
       FNomeArquivoBat := BAT_BRANCH_PDV;
-      FBuscaBranches := 'PDV';
+      FBuscaVersoes := 'PDV';
+      CarregarVersoesFavoritas(BRANCHES_FAVORITAS_PDV);
     end;
   end;
 end;
 
 procedure TFrmPrincipal.RgCompilacaoClick(Sender: TObject);
 begin
+  FCompilacaoEscolhida := RgCompilacao.Items.Strings[RgCompilacao.ItemIndex];
   ModificarComponentes;
 end;
 
@@ -172,10 +210,10 @@ begin
       LLista.Add('- ' + LblSistema.Caption);
     if RgCompilacao.ItemIndex < 0 then
       LLista.Add('- ' + RgCompilacao.Caption);
-    if RgCompilacao.ItemIndex = 1 then
+    if ((RgCompilacao.ItemIndex = 0) and (FSistemaEscolhido = SISTEMA_PDV_Alterdata)) or (RgCompilacao.ItemIndex = 1) then
     begin
-      if LbxBranches.ItemIndex < 0 then
-        LLista.Add('- ' + LblBranch.Caption);
+      if LbxVersoes.ItemIndex < 0 then
+        LLista.Add('- ' + LblBranchLib.Caption);
     end;
 
     Result := LLista.Count = 0;
@@ -191,10 +229,16 @@ end;
 
 procedure TFrmPrincipal.TravarUI(PTravado: Boolean);
 begin
-  BtnAtualizar.Enabled := not PTravado;
   CbbSistema.Enabled := not PTravado;
   RgCompilacao.Enabled := not PTravado;
-  LbxBranches.Enabled := (not PTravado) and (RgCompilacao.ItemIndex = 1);
+  BtnAdicionarVersao.Enabled := not PTravado;
+  BtnRemoverVersao.Enabled := not PTravado;
+  BtnLimparVersoes.Enabled := not PTravado;
+
+  LbxVersoes.Enabled := ((not PTravado) and (RgCompilacao.ItemIndex = 1)) or
+  ((not PTravado) and (RgCompilacao.ItemIndex = 0) and (FSistemaEscolhido = SISTEMA_PDV_Alterdata));
+
+  BtnAtualizar.Enabled := not PTravado;
 end;
 
 procedure TFrmPrincipal.AdicionarLog(const PLinha: string);
@@ -354,22 +398,7 @@ begin
   end;
 end;
 
-function TFrmPrincipal.ExtrairVersaoBranch(const PNomeBranch: string): string;
-var
-  LRegex: TRegEx;
-  LMatch: TMatch;
-begin
-  LRegex := TRegEx.Create('^(WSHOP|PDV_ALTERDATA)_(\d[\d.,]*)(_.*)?$', [roIgnoreCase]);
-  LMatch := LRegex.Match(PNomeBranch);
-
-  if not LMatch.Success then
-    raise Exception.CreateFmt('A branch "%s" está em um formato não reconhecido.' + sLineBreak +
-          'Esperado prefixo "WSHOP_" ou "PDV_ALTERDATA_" seguido da versão.', [PNomeBranch]);
-
-  Result := LMatch.Groups[2].Value;
-end;
-
-procedure TFrmPrincipal.BtnAdicionarBranchClick(Sender: TObject);
+procedure TFrmPrincipal.BtnAdicionarVersaoClick(Sender: TObject);
 var
   LFrmBranches: TFrmBranches;
   I: Integer;
@@ -377,20 +406,24 @@ begin
   LFrmBranches := nil;
   try
     LFrmBranches := TFrmBranches.Create(nil);
-    LFrmBranches.CarregarListBox(DIRETORIO_BRANCHES, FBuscaBranches);
+    LFrmBranches.CarregarVersoes(DIRETORIO_BRANCHES, FBuscaVersoes, FCompilacaoEscolhida);
     LFrmBranches.ShowModal;
 
-    for I := 0 to LFrmBranches.ListaBranchesSelecionadas.Count -1 do
+    for I := 0 to LFrmBranches.ListaVersoesSelecionadas.Count -1 do
     begin
-      if LbxBranches.Items.IndexOf(LFrmBranches.ListaBranchesSelecionadas[I]) = -1 then
-        LbxBranches.Items.Add(LFrmBranches.ListaBranchesSelecionadas[I]);
+      if LbxVersoes.Items.IndexOf(LFrmBranches.ListaVersoesSelecionadas[I]) = -1 then
+        LbxVersoes.Items.Add(LFrmBranches.ListaVersoesSelecionadas[I]);
     end;
 
-    if (CbbSistema.Items.Strings[CbbSistema.ItemIndex] = SISTEMA_ISHOP_WSHOP) or
-       (CbbSistema.Items.Strings[CbbSistema.ItemIndex] = SISTEMA_SHOP_SIMPLES) then
-      GravarBranchesFavoritas(BRANCHES_FAVORITAS_SHOP)
-    else if CbbSistema.Items.Strings[CbbSistema.ItemIndex] = SISTEMA_PDV_Alterdata then
-      GravarBranchesFavoritas(BRANCHES_FAVORITAS_PDV);
+    if (FSistemaEscolhido = SISTEMA_ISHOP_WSHOP) or (FSistemaEscolhido = SISTEMA_SHOP_SIMPLES) then
+      GravarVersoesFavoritas(BRANCHES_FAVORITAS_SHOP)
+    else if FSistemaEscolhido = SISTEMA_PDV_Alterdata then
+    begin
+      if FCompilacaoEscolhida = 'Trunk' then
+        GravarVersoesFavoritas(LIBS_FAVORITAS_SHOP_PDV)
+      else if FCompilacaoEscolhida = 'Branch' then
+        GravarVersoesFavoritas(BRANCHES_FAVORITAS_PDV);
+    end;
   finally
     if Assigned(LFrmBranches) then
       FreeAndNil(LFrmBranches);
@@ -399,20 +432,23 @@ end;
 
 procedure TFrmPrincipal.BtnAtualizarClick(Sender: TObject);
 var
-  LNomeBranch, LVersaoBranch: string;
+  LNomeVersao, LNumeroVersao: string;
 begin
+  LNomeVersao := EmptyStr;
+  LNumeroVersao := EmptyStr;
+
   if not ValidarCamposPreenchidos then
     Exit;
 
-  ExecutarBat(ExtractFilePath(Application.ExeName) + BAT_ENCERRA_PROC);
-
-  if RgCompilacao.Items.Strings[RgCompilacao.ItemIndex] = 'Trunc' then
-    ExecutarBat(ExtractFilePath(Application.ExeName) + FNomeArquivoBat)
-  else if RgCompilacao.Items.Strings[RgCompilacao.ItemIndex] = 'Branch' then
+  if (FCompilacaoEscolhida = 'Trunk') and (FSistemaEscolhido = SISTEMA_PDV_Alterdata) then
   begin
-    LNomeBranch := LbxBranches.Items.Strings[LbxBranches.ItemIndex];
+    LNomeVersao := 'WSHOP_' + LbxVersoes.Items.Strings[LbxVersoes.ItemIndex];
+  end
+  else if (FCompilacaoEscolhida = 'Branch') then
+  begin
+    LNomeVersao := LbxVersoes.Items.Strings[LbxVersoes.ItemIndex];
     try
-      LVersaoBranch := ExtrairVersaoBranch(LNomeBranch);
+      LNumeroVersao := TFuncoes.ExtrairVersao(LNomeVersao);
     except
       on E: Exception do
       begin
@@ -420,11 +456,13 @@ begin
         Exit;
       end;
     end;
-    ExecutarBat(ExtractFilePath(Application.ExeName) + FNomeArquivoBat, LNomeBranch, LVersaoBranch);
   end;
+
+  ExecutarBat(ExtractFilePath(Application.ExeName) + BAT_ENCERRA_PROC);
+  ExecutarBat(ExtractFilePath(Application.ExeName) + FNomeArquivoBat, LNomeVersao, LNumeroVersao);
 end;
 
-procedure TFrmPrincipal.BtnLimparBranchesClick(Sender: TObject);
+procedure TFrmPrincipal.BtnLimparVersoesClick(Sender: TObject);
 var
   Resposta: Integer;
 begin
@@ -432,31 +470,31 @@ begin
 
   if Resposta = IDYES then
   begin
-    LbxBranches.Items.Clear;
+    LbxVersoes.Items.Clear;
 
-    if (CbbSistema.Items.Strings[CbbSistema.ItemIndex] = SISTEMA_ISHOP_WSHOP) or
-       (CbbSistema.Items.Strings[CbbSistema.ItemIndex] = SISTEMA_SHOP_SIMPLES) then
-      GravarBranchesFavoritas(BRANCHES_FAVORITAS_SHOP)
-    else if CbbSistema.Items.Strings[CbbSistema.ItemIndex] = SISTEMA_PDV_Alterdata then
-      GravarBranchesFavoritas(BRANCHES_FAVORITAS_PDV);
+    if (FSistemaEscolhido = SISTEMA_ISHOP_WSHOP) or
+       (FSistemaEscolhido = SISTEMA_SHOP_SIMPLES) then
+      GravarVersoesFavoritas(BRANCHES_FAVORITAS_SHOP)
+    else if FSistemaEscolhido = SISTEMA_PDV_Alterdata then
+      GravarVersoesFavoritas(BRANCHES_FAVORITAS_PDV);
   end;
 end;
 
-procedure TFrmPrincipal.BtnRemoverBranchClick(Sender: TObject);
+procedure TFrmPrincipal.BtnRemoverVersaoClick(Sender: TObject);
 begin
-  if LbxBranches.ItemIndex <> -1 then
+  if LbxVersoes.ItemIndex <> -1 then
   begin
-    LbxBranches.Items.Delete(LbxBranches.ItemIndex);
+    LbxVersoes.Items.Delete(LbxVersoes.ItemIndex);
 
-    if (CbbSistema.Items.Strings[CbbSistema.ItemIndex] = SISTEMA_ISHOP_WSHOP) or
-       (CbbSistema.Items.Strings[CbbSistema.ItemIndex] = SISTEMA_SHOP_SIMPLES) then
-      GravarBranchesFavoritas(BRANCHES_FAVORITAS_SHOP)
-    else if CbbSistema.Items.Strings[CbbSistema.ItemIndex] = SISTEMA_PDV_Alterdata then
-      GravarBranchesFavoritas(BRANCHES_FAVORITAS_PDV);
+    if (FSistemaEscolhido = SISTEMA_ISHOP_WSHOP) or
+       (FSistemaEscolhido = SISTEMA_SHOP_SIMPLES) then
+      GravarVersoesFavoritas(BRANCHES_FAVORITAS_SHOP)
+    else if FSistemaEscolhido = SISTEMA_PDV_Alterdata then
+      GravarVersoesFavoritas(BRANCHES_FAVORITAS_PDV);
   end;
 end;
 
-procedure TFrmPrincipal.CarregarBranchesFavoritas(PTipoBranch: string);
+procedure TFrmPrincipal.CarregarVersoesFavoritas(PTipoVersao: string);
 var
   LArquivoIni: TIniFile;
   LCaminhoIni: string;
@@ -464,7 +502,7 @@ var
   I: Integer;
   LValorBranch: string;
 begin
-  LCaminhoIni := TPath.Combine(TPath.GetDirectoryName(ParamStr(0)), 'BranchesFavoritas.ini');
+  LCaminhoIni := TPath.Combine(TPath.GetDirectoryName(ParamStr(0)), 'VersoesFavoritas.ini');
 
   if not TFile.Exists(LCaminhoIni) then
   begin
@@ -477,8 +515,8 @@ begin
     LListaBranches := TStringList.Create;
     LArquivoIni := TIniFile.Create(LCaminhoIni);
 
-    LbxBranches.Items.Clear;
-    LArquivoIni.ReadSectionValues(PTipoBranch, LListaBranches);
+    LbxVersoes.Items.Clear;
+    LArquivoIni.ReadSectionValues(PTipoVersao, LListaBranches);
 
     for I := 0 to LListaBranches.Count - 1 do
     begin
@@ -486,7 +524,7 @@ begin
       LValorBranch := LListaBranches.ValueFromIndex[I];
 
       if LValorBranch <> EmptyStr then
-        LbxBranches.Items.Add(LValorBranch);
+        LbxVersoes.Items.Add(LValorBranch);
     end;
   finally
     LListaBranches.Free;
@@ -496,13 +534,23 @@ end;
 
 procedure TFrmPrincipal.CbbSistemaChange(Sender: TObject);
 begin
-  LbxBranches.Items.Clear;
+  LbxVersoes.Items.Clear;
+  FSistemaEscolhido := CbbSistema.Items.Strings[CbbSistema.ItemIndex];
 
-  if (CbbSistema.Items.Strings[CbbSistema.ItemIndex] = SISTEMA_ISHOP_WSHOP) or
-     (CbbSistema.Items.Strings[CbbSistema.ItemIndex] = SISTEMA_SHOP_SIMPLES) then
-    CarregarBranchesFavoritas(BRANCHES_FAVORITAS_SHOP)
-  else if CbbSistema.Items.Strings[CbbSistema.ItemIndex] = SISTEMA_PDV_Alterdata then
-    CarregarBranchesFavoritas(BRANCHES_FAVORITAS_PDV);
+  if (FSistemaEscolhido = SISTEMA_ISHOP_WSHOP) or (FSistemaEscolhido = SISTEMA_SHOP_SIMPLES) then
+  begin
+    if RgCompilacao.ItemIndex = 0 then
+      LbxVersoes.Items.Clear
+    else if RgCompilacao.ItemIndex = 1 then
+      CarregarVersoesFavoritas(BRANCHES_FAVORITAS_SHOP);
+  end
+  else if FSistemaEscolhido = SISTEMA_PDV_Alterdata then
+  begin
+    if RgCompilacao.ItemIndex = 0 then
+      CarregarVersoesFavoritas(LIBS_FAVORITAS_SHOP_PDV)
+    else if RgCompilacao.ItemIndex = 1 then
+      CarregarVersoesFavoritas(BRANCHES_FAVORITAS_PDV);
+  end;
 
   ModificarComponentes;
 end;

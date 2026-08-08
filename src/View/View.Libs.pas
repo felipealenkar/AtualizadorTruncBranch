@@ -17,10 +17,10 @@ type
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
   private
-    function ListarPastasRaiz(const PPasta, PSistema, PCompilacao: string): TStringList;
+    function ListarPastasRaiz(const PPasta, PSistema: string): TStringList;
   public
-    ListaVersoesSelecionadas: TStringList;
-    procedure CarregarVersoes(PDiretorio, PSistema, PCompilacao: string);
+    ListaBranchesSelecionadas: TStringList;
+    procedure CarregarListBox(PDiretorio, PSistema: string);
   end;
 
 implementation
@@ -39,18 +39,18 @@ begin
   for I := 0 to chklstBranches.Items.Count -1 do
   begin
     if chklstBranches.Checked[i] = True then
-      ListaVersoesSelecionadas.Add(chklstBranches.Items.Strings[I]);
+      ListaBranchesSelecionadas.Add(chklstBranches.Items.Strings[I]);
   end;
   ModalResult := mrOk;
 end;
 
-procedure TFrmBranches.CarregarVersoes(PDiretorio, PSistema, PCompilacao: string);
+procedure TFrmBranches.CarregarListBox(PDiretorio, PSistema: string);
 var
   LListaPastas: TStringList;
 begin
   LListaPastas := nil;
   try
-    LListaPastas := ListarPastasRaiz(PDiretorio, PSistema, PCompilacao);
+    LListaPastas := ListarPastasRaiz(PDiretorio, PSistema);
     chklstBranches.Items.Assign(LListaPastas);
   finally
     if Assigned(LListaPastas) then
@@ -74,15 +74,15 @@ end;
 
 procedure TFrmBranches.FormCreate(Sender: TObject);
 begin
-  ListaVersoesSelecionadas := TStringList.Create;
+  ListaBranchesSelecionadas := TStringList.Create;
 end;
 
 procedure TFrmBranches.FormDestroy(Sender: TObject);
 begin
-  ListaVersoesSelecionadas.Free;
+  ListaBranchesSelecionadas.Free;
 end;
 
-function TFrmBranches.ListarPastasRaiz(const PPasta, PSistema, PCompilacao: string): TStringList;
+function TFrmBranches.ListarPastasRaiz(const PPasta, PSistema: string): TStringList;
 var
   Pastas: TArray<string>;
   Pasta: string;
@@ -91,18 +91,7 @@ begin
   Pastas := TDirectory.GetDirectories(PPasta, PSistema + '*', TSearchOption.soTopDirectoryOnly);
 
   for Pasta in Pastas do
-  begin
-    if PCompilacao = 'Trunk' then
-      Result.Add(StringReplace(ExtractFileName(Pasta), 'WSHOP_', EmptyStr, [rfReplaceAll, rfIgnoreCase]))
-    else
-      Result.Add(ExtractFileName(Pasta));
-  end;
-
-  if PCompilacao = 'Trunk' then
-  begin
-    if not Result.Contains('Trunk Atual') then
-      Result.Add('Trunk Atual');
-  end;
+    Result.Add(ExtractFileName(Pasta));
 end;
 
 end.

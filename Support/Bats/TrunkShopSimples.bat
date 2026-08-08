@@ -1,6 +1,6 @@
 @echo off
 chcp 65001 > nul
-title Atualização da Trunc ShopSimples com Robocopy
+title Atualização da Trunk ShopSimples com Robocopy
 color 0A
 
 :: -------------------------------------------------------------------------
@@ -16,7 +16,7 @@ if %errorlevel% neq 0 (
     echo Como a sua empresa possui bloqueios de rede, siga estes passos:
     echo.
     echo 1. Feche esta janela preta.
-    echo 2. Clique com o BOTAO DIREITO no arquivo "TruncShopSimples.bat".
+    echo 2. Clique com o BOTAO DIREITO no arquivo "TrunkShopSimples.bat".
     echo 3. Escolha a opcao "Executar como Administrador".
     echo.
     pause >nul
@@ -24,7 +24,7 @@ if %errorlevel% neq 0 (
 )
 
 echo ========================================================================================================
-echo            INICIANDO ATUALIZAÇÃO DA TRUNC SHOP SIMPLES
+echo            INICIANDO ATUALIZAÇÃO DA TRUNK SHOP SIMPLES
 echo ========================================================================================================
 echo.
 

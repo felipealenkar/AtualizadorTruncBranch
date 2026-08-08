@@ -35,12 +35,12 @@ echo -------------------------------------------------------------------------
 :: LISTA DE PROCESSOS: Adicione ou remova os .exe aqui dentro dos parênteses, separados por ESPAÇO.
 for %%P in (
     AdminEmissaoOtimizada.exe
-    AlterdataManager.exe
     AltShopConfCegaPDV.exe
     AltShop_ConfigBasePadrao.exe
     AltShopConfigSrvPDV.exe
     AltShopProc_AlinhamentoTransacaoPendenteIShop.exe
     AltShopProc_AlinhamentoTransacaoPendenteWShop.exe
+    AltShopProc_AtualizarDocNFeWshop.exe
     AltShopProc_AuditorEventos.exe
     AltShopProc_CadastroProdutos.exe
     altshopproc_financeiro.exe
@@ -48,9 +48,11 @@ for %%P in (
     AltShop_AgenteTerminalPreVenda.exe
     AltShop_GerenciadorNotas.exe
     AltShop_GerenteEletronico.exe
+    AltShop_ImpressaoEtiquetasOffLine.exe
     AltShop_IntegradorSpice.exe
     AltShopServicePDV.exe
     AltShop_SpiceDelivery.exe
+    AltShopProcExtratorXML.exe
     ConcentradorGuardian.exe
     ExpOffLine.exe
     IAdminEmissaoOtimizada.exe
@@ -70,6 +72,7 @@ for %%P in (
     ServidorOffLineGuardian.exe
     Shell.exe
     Spice.exe
+    TotenMarket.exe
     WAgendaAdmin.exe
     wcash.exe
     WorcAdmin.exe

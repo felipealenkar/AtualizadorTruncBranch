@@ -3,7 +3,7 @@ object FrmPrincipal: TFrmPrincipal
   Top = 0
   BorderIcons = [biSystemMenu, biMinimize]
   BorderStyle = bsSingle
-  Caption = 'Atualizador Trunc/Branch'
+  Caption = 'Atualizador Trunk/Branch'
   ClientHeight = 615
   ClientWidth = 1342
   Color = clBtnFace
@@ -8484,13 +8484,13 @@ object FrmPrincipal: TFrmPrincipal
       Anchors = [akLeft, akTop, akRight]
       Caption = 'Sistema'
     end
-    object LblBranch: TLabel
+    object LblBranchLib: TLabel
       Left = 15
       Top = 170
-      Width = 90
+      Width = 338
       Height = 15
       Anchors = [akLeft, akTop, akRight]
-      Caption = 'Vers'#227'o da Branch'
+      AutoSize = False
       Enabled = False
     end
     object CbbSistema: TComboBox
@@ -8525,12 +8525,12 @@ object FrmPrincipal: TFrmPrincipal
       Caption = 'Compila'#231#227'o'
       Enabled = False
       Items.Strings = (
-        'Trunc'
+        'Trunk'
         'Branch')
       TabOrder = 2
       OnClick = RgCompilacaoClick
     end
-    object LbxBranches: TListBox
+    object LbxVersoes: TListBox
       Left = 57
       Top = 191
       Width = 296
@@ -8540,7 +8540,7 @@ object FrmPrincipal: TFrmPrincipal
       Sorted = True
       TabOrder = 3
     end
-    object BtnAdicionarBranch: TButton
+    object BtnAdicionarVersao: TButton
       Left = 15
       Top = 191
       Width = 36
@@ -8554,9 +8554,9 @@ object FrmPrincipal: TFrmPrincipal
       ImageMargins.Bottom = 1
       Images = VImgLImagensMenores
       TabOrder = 4
-      OnClick = BtnAdicionarBranchClick
+      OnClick = BtnAdicionarVersaoClick
     end
-    object BtnRemoverBranch: TButton
+    object BtnRemoverVersao: TButton
       Left = 15
       Top = 233
       Width = 36
@@ -8570,9 +8570,9 @@ object FrmPrincipal: TFrmPrincipal
       ImageMargins.Bottom = 1
       Images = VImgLImagensMenores
       TabOrder = 5
-      OnClick = BtnRemoverBranchClick
+      OnClick = BtnRemoverVersaoClick
     end
-    object BtnLimparBranches: TButton
+    object BtnLimparVersoes: TButton
       Left = 15
       Top = 275
       Width = 36
@@ -8586,7 +8586,7 @@ object FrmPrincipal: TFrmPrincipal
       ImageMargins.Bottom = 1
       Images = VImgLImagensMenores
       TabOrder = 6
-      OnClick = BtnLimparBranchesClick
+      OnClick = BtnLimparVersoesClick
     end
   end
   object PnlLog: TPanel
