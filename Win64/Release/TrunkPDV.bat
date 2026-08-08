@@ -95,7 +95,7 @@ set "DESTINO15=C:\Program Files (x86)\Alterdata\PDV Alterdata\Lays\VendaFutura"
 :: CAMINHOS CONDICIONAIS - (dependem do parâmetro da branch)
 :: -------------------------------------------------------------------------
 
-if /I "%NOME_LIB%"=="Trunk Atual" (
+if /I "%NOME_LIB%"=="Trunk" (
     set "ORIGEM_OP1=G:\ALTERDAT\Versoes\wshop\Hudson\trunk\BPL\Tokyo\Alterdata"
     set "DESTINO_OP1=C:\Program Files (x86)\Alterdata\Biblioteca"
 

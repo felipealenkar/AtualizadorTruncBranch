@@ -79,6 +79,7 @@ const
   COMPILACAO_BRANCH: string = 'Branch';
 
   DIRETORIO_BRANCHES: string = 'G:\ALTERDAT\Versoes\wshop\Hudson\branches\';
+  //DIRETORIO_BRANCHES: string = 'C:\Projects\AtualizadorTrunkBranch\Win64\Debug';
 
 implementation
 
@@ -451,7 +452,7 @@ begin
     LNomeVersao := LbxVersoes.Items.Strings[LbxVersoes.ItemIndex];
 
   if (FCompilacaoEscolhida = COMPILACAO_TRUNK) and (FSistemaEscolhido = SISTEMA_PDV_Alterdata) and
-     (LNomeVersao <> 'Trunk Atual') then
+     (LNomeVersao <> 'Trunk') then
   begin
     LNomeVersao := PREFIXO_WSHOP + '_' + LNomeVersao;
   end
