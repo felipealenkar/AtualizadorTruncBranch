@@ -26,7 +26,8 @@ type
 implementation
 
 uses
-  System.IOUtils;
+  System.IOUtils,
+  Utils.Funcoes;
 
 {$R *.dfm}
 
@@ -93,7 +94,12 @@ begin
   for Pasta in Pastas do
   begin
     if PCompilacao = 'Trunk' then
-      Result.Add(StringReplace(ExtractFileName(Pasta), 'WSHOP_', EmptyStr, [rfReplaceAll, rfIgnoreCase]))
+    begin
+      var LVersaoExtraida: string := StringReplace(TFuncoes.ExtrairVersao(ExtractFileName(Pasta)), 'WSHOP_', EmptyStr, [rfReplaceAll, rfIgnoreCase]);
+
+      if Result.IndexOf(LVersaoExtraida) = -1 then
+        Result.Add(LVersaoExtraida);
+    end
     else
       Result.Add(ExtractFileName(Pasta));
   end;
