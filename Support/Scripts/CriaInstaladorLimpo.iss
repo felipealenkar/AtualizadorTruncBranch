@@ -71,7 +71,6 @@ var
   sAtalhoCompleto: String;
 begin
   sUsersDir := ExpandConstant('{sd}\Users');
-
   if FindFirst(sUsersDir + '\*', FindRec) then
   begin
     try
@@ -81,7 +80,6 @@ begin
         begin
           sDesktopPath := sUsersDir + '\' + FindRec.Name + '\Desktop';
           sAtalhoCompleto := sDesktopPath + '\' + NomeAtalho;
-
           if FileExists(sAtalhoCompleto) then
           begin
             DeleteFile(sAtalhoCompleto);
@@ -97,10 +95,30 @@ end;
 procedure CurStepChanged(CurStep: TSetupStep);
 var
   sInstallDirAntigo: String;
+  sInstallDirNovo: String;
+  sIniAntigo: String;
+  sIniNovo: String;
 begin
   if CurStep = ssInstall then
   begin
     sInstallDirAntigo := ExpandConstant('{autopf32}\Alterdata\AtualizadorTruncBranch');
+    sInstallDirNovo := ExpandConstant('{app}');
+
+    // Nome antigo do arquivo
+    sIniAntigo := sInstallDirAntigo + '\BranchesFavoritas.ini';
+    // Nome NOVO do arquivo (renomeado nessa migração)
+    sIniNovo := sInstallDirNovo + '\VersoesFavoritas.ini';
+
+    // Se o .ini antigo existir, migra (com o novo nome) ANTES de apagar a pasta antiga
+    if FileExists(sIniAntigo) then
+    begin
+      if not DirExists(sInstallDirNovo) then
+        ForceDirectories(sInstallDirNovo);
+
+      FileCopy(sIniAntigo, sIniNovo, False);
+    end;
+
+    // Agora sim, apaga a pasta antiga inteira
     if DirExists(sInstallDirAntigo) then
       DelTree(sInstallDirAntigo, True, True, True);
 
