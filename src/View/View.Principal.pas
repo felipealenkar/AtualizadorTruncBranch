@@ -72,7 +72,13 @@ const
   SISTEMA_SHOP_SIMPLES: string = 'Shop Simples';
   SISTEMA_PDV_Alterdata: string = 'PDV Alterdata';
 
-  DIRETORIO_BRANCHES: string = 'C:\Projects\AtualizadorTrunkBranch\Win64\Debug\'; //'G:\ALTERDAT\Versoes\wshop\Hudson\branches\';
+  PREFIXO_WSHOP: string = 'WSHOP';
+  PREFIXO_PDV: string = 'PDV';
+
+  COMPILACAO_TRUNK: string = 'Trunk';
+  COMPILACAO_BRANCH: string = 'Branch';
+
+  DIRETORIO_BRANCHES: string = 'G:\ALTERDAT\Versoes\wshop\Hudson\branches\';
 
 implementation
 
@@ -100,7 +106,7 @@ begin
     LArquivoIni.EraseSection(PTipoBranch);
 
     for I := 0 to LbxVersoes.Items.Count -1 do
-      LArquivoIni.WriteString(PTipoBranch, 'Branch_' + I.ToString, LbxVersoes.Items.Strings[I]);
+      LArquivoIni.WriteString(PTipoBranch, COMPILACAO_BRANCH + '_' + I.ToString, LbxVersoes.Items.Strings[I]);
   finally
     LArquivoIni.Free;
   end;
@@ -111,8 +117,8 @@ begin
   CbbSistema.Items.Add(SISTEMA_ISHOP_WSHOP);
   CbbSistema.Items.Add(SISTEMA_SHOP_SIMPLES);
   CbbSistema.Items.Add(SISTEMA_PDV_Alterdata);
-  RgCompilacao.ItemIndex := 0;
-  CbbSistema.ItemIndex := 0;
+  RgCompilacao.ItemIndex := RgCompilacao.Items.IndexOf(COMPILACAO_TRUNK);
+  CbbSistema.ItemIndex := CbbSistema.Items.IndexOf(SISTEMA_ISHOP_WSHOP);
   FSistemaEscolhido := CbbSistema.Items.Strings[CbbSistema.ItemIndex];
   FCompilacaoEscolhida := RgCompilacao.Items.Strings[RgCompilacao.ItemIndex];
   ModificarComponentes;
@@ -123,7 +129,7 @@ procedure TFrmPrincipal.ModificarComponentes;
 begin
   RgCompilacao.Enabled := CbbSistema.ItemIndex >= 0;
 
-  if RgCompilacao.ItemIndex = 0 then
+  if RgCompilacao.ItemIndex = RgCompilacao.Items.IndexOf(COMPILACAO_TRUNK) then
   begin
     if FSistemaEscolhido = SISTEMA_ISHOP_WSHOP then
     begin
@@ -159,11 +165,11 @@ begin
       LblBranchLib.Caption := 'Versão da Lib Shop compatível';
       LbxVersoes.ItemIndex := -1;
       FNomeArquivoBat := BAT_TRUNK_PDV;
-      FBuscaVersoes := 'WSHOP'; //Aqui é Wshop pois queremos a versão da Lib do Wshop mesmo
+      FBuscaVersoes := PREFIXO_WSHOP; //Aqui é Wshop pois queremos a versão da Lib do Wshop mesmo
       CarregarVersoesFavoritas(LIBS_FAVORITAS_SHOP_PDV);
     end;
   end
-  else if RgCompilacao.ItemIndex = 1 then
+  else if RgCompilacao.ItemIndex = RgCompilacao.Items.IndexOf(COMPILACAO_BRANCH) then
   begin
     LbxVersoes.Enabled := True;
     BtnAdicionarVersao.Enabled := True;
@@ -175,19 +181,19 @@ begin
     if FSistemaEscolhido = SISTEMA_ISHOP_WSHOP then
     begin
       FNomeArquivoBat := BAT_BRANCH_SHOP;
-      FBuscaVersoes := 'WSHOP';
+      FBuscaVersoes := PREFIXO_WSHOP;
       CarregarVersoesFavoritas(BRANCHES_FAVORITAS_SHOP);
     end
     else if FSistemaEscolhido = SISTEMA_SHOP_SIMPLES then
     begin
       FNomeArquivoBat := BAT_BRANCH_SHOP_SIMPLES;
-      FBuscaVersoes := 'WSHOP';
+      FBuscaVersoes := PREFIXO_WSHOP;
       CarregarVersoesFavoritas(BRANCHES_FAVORITAS_SHOP);
     end
     else if FSistemaEscolhido = SISTEMA_PDV_Alterdata then
     begin
       FNomeArquivoBat := BAT_BRANCH_PDV;
-      FBuscaVersoes := 'PDV';
+      FBuscaVersoes := PREFIXO_PDV;
       CarregarVersoesFavoritas(BRANCHES_FAVORITAS_PDV);
     end;
   end;
@@ -210,7 +216,8 @@ begin
       LLista.Add('- ' + LblSistema.Caption);
     if RgCompilacao.ItemIndex < 0 then
       LLista.Add('- ' + RgCompilacao.Caption);
-    if ((RgCompilacao.ItemIndex = 0) and (FSistemaEscolhido = SISTEMA_PDV_Alterdata)) or (RgCompilacao.ItemIndex = 1) then
+    if ((RgCompilacao.ItemIndex = RgCompilacao.Items.IndexOf(COMPILACAO_TRUNK)) and
+       (FSistemaEscolhido = SISTEMA_PDV_Alterdata)) or (RgCompilacao.ItemIndex = RgCompilacao.Items.IndexOf(COMPILACAO_BRANCH)) then
     begin
       if LbxVersoes.ItemIndex < 0 then
         LLista.Add('- ' + LblBranchLib.Caption);
@@ -235,8 +242,8 @@ begin
   BtnRemoverVersao.Enabled := not PTravado;
   BtnLimparVersoes.Enabled := not PTravado;
 
-  LbxVersoes.Enabled := ((not PTravado) and (RgCompilacao.ItemIndex = 1)) or
-  ((not PTravado) and (RgCompilacao.ItemIndex = 0) and (FSistemaEscolhido = SISTEMA_PDV_Alterdata));
+  LbxVersoes.Enabled := ((not PTravado) and (RgCompilacao.ItemIndex = RgCompilacao.Items.IndexOf(COMPILACAO_BRANCH))) or
+  ((not PTravado) and (RgCompilacao.ItemIndex = RgCompilacao.Items.IndexOf(COMPILACAO_TRUNK)) and (FSistemaEscolhido = SISTEMA_PDV_Alterdata));
 
   BtnAtualizar.Enabled := not PTravado;
 end;
@@ -419,9 +426,9 @@ begin
       GravarVersoesFavoritas(BRANCHES_FAVORITAS_SHOP)
     else if FSistemaEscolhido = SISTEMA_PDV_Alterdata then
     begin
-      if FCompilacaoEscolhida = 'Trunk' then
+      if FCompilacaoEscolhida = COMPILACAO_TRUNK then
         GravarVersoesFavoritas(LIBS_FAVORITAS_SHOP_PDV)
-      else if FCompilacaoEscolhida = 'Branch' then
+      else if FCompilacaoEscolhida = COMPILACAO_BRANCH then
         GravarVersoesFavoritas(BRANCHES_FAVORITAS_PDV);
     end;
   finally
@@ -440,13 +447,16 @@ begin
   if not ValidarCamposPreenchidos then
     Exit;
 
-  if (FCompilacaoEscolhida = 'Trunk') and (FSistemaEscolhido = SISTEMA_PDV_Alterdata) then
-  begin
-    LNomeVersao := 'WSHOP_' + LbxVersoes.Items.Strings[LbxVersoes.ItemIndex];
-  end
-  else if (FCompilacaoEscolhida = 'Branch') then
-  begin
+  if LbxVersoes.ItemIndex >= 0 then
     LNomeVersao := LbxVersoes.Items.Strings[LbxVersoes.ItemIndex];
+
+  if (FCompilacaoEscolhida = COMPILACAO_TRUNK) and (FSistemaEscolhido = SISTEMA_PDV_Alterdata) and
+     (LNomeVersao <> 'Trunk Atual') then
+  begin
+    LNomeVersao := PREFIXO_WSHOP + '_' + LNomeVersao;
+  end
+  else if (FCompilacaoEscolhida = COMPILACAO_BRANCH) then
+  begin
     try
       LNumeroVersao := TFuncoes.ExtrairVersao(LNomeVersao);
     except
@@ -539,16 +549,16 @@ begin
 
   if (FSistemaEscolhido = SISTEMA_ISHOP_WSHOP) or (FSistemaEscolhido = SISTEMA_SHOP_SIMPLES) then
   begin
-    if RgCompilacao.ItemIndex = 0 then
+    if RgCompilacao.Items.Strings[RgCompilacao.ItemIndex] = COMPILACAO_TRUNK then
       LbxVersoes.Items.Clear
-    else if RgCompilacao.ItemIndex = 1 then
+    else if RgCompilacao.Items.Strings[RgCompilacao.ItemIndex] = COMPILACAO_BRANCH then
       CarregarVersoesFavoritas(BRANCHES_FAVORITAS_SHOP);
   end
   else if FSistemaEscolhido = SISTEMA_PDV_Alterdata then
   begin
-    if RgCompilacao.ItemIndex = 0 then
+    if RgCompilacao.Items.Strings[RgCompilacao.ItemIndex] = COMPILACAO_TRUNK then
       CarregarVersoesFavoritas(LIBS_FAVORITAS_SHOP_PDV)
-    else if RgCompilacao.ItemIndex = 1 then
+    else if RgCompilacao.Items.Strings[RgCompilacao.ItemIndex] = COMPILACAO_BRANCH then
       CarregarVersoesFavoritas(BRANCHES_FAVORITAS_PDV);
   end;
 
