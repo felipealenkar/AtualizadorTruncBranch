@@ -23,6 +23,7 @@ SetupIconFile={#InstallerIcon}
 ; Pasta de instalação fixa (C:\Program Files (x86)\Alterdata\AtualizadorTrunkBranch)
 DefaultDirName={autopf32}\Alterdata\AtualizadorTrunkBranch
 DisableDirPage=yes
+UsePreviousAppDir=no
 
 ; Pasta do grupo do Menu Iniciar fixa
 DefaultGroupName={#MyAppName}
@@ -62,21 +63,48 @@ Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"
 Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
 
 [Code]
+procedure ExcluirAtalhoDeTodosUsuarios(const NomeAtalho: String);
+var
+  FindRec: TFindRec;
+  sUsersDir: String;
+  sDesktopPath: String;
+  sAtalhoCompleto: String;
+begin
+  sUsersDir := ExpandConstant('{sd}\Users');
+
+  if FindFirst(sUsersDir + '\*', FindRec) then
+  begin
+    try
+      repeat
+        if (FindRec.Attributes and FILE_ATTRIBUTE_DIRECTORY <> 0) and
+           (FindRec.Name <> '.') and (FindRec.Name <> '..') then
+        begin
+          sDesktopPath := sUsersDir + '\' + FindRec.Name + '\Desktop';
+          sAtalhoCompleto := sDesktopPath + '\' + NomeAtalho;
+
+          if FileExists(sAtalhoCompleto) then
+          begin
+            DeleteFile(sAtalhoCompleto);
+          end;
+        end;
+      until not FindNext(FindRec);
+    finally
+      FindClose(FindRec);
+    end;
+  end;
+end;
+
 procedure CurStepChanged(CurStep: TSetupStep);
 var
   sInstallDirAntigo: String;
-  sDesktopShortcutAntigo: String;
 begin
   if CurStep = ssInstall then
   begin
-    // Pasta antiga (nome com "Trunc" - typo da versão anterior)
     sInstallDirAntigo := ExpandConstant('{autopf32}\Alterdata\AtualizadorTruncBranch');
     if DirExists(sInstallDirAntigo) then
       DelTree(sInstallDirAntigo, True, True, True);
 
-    // Atalho antigo na área de trabalho (mesmo nome de exibição, então o .lnk deve ser igual)
-    sDesktopShortcutAntigo := ExpandConstant('{autodesktop}\Atualizador Trunc Branch.lnk');
-    if FileExists(sDesktopShortcutAntigo) then
-      DeleteFile(sDesktopShortcutAntigo);
+    // Apaga o atalho antigo de TODOS os perfis de usuário (incluindo Public)
+    ExcluirAtalhoDeTodosUsuarios('Atualizador Trunc Branch.lnk');
   end;
 end;
