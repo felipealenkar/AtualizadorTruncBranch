@@ -79,7 +79,7 @@ echo ==========================================================================
 echo VALIDAÇÃO DAS PASTAS DE ORIGEM
 echo ==========================================================================
 
-echo 🔍 [Validando Pastas] Verificando se os diretórios de origem existem no G:\...
+echo 🔍 Verificando se os diretórios de origem existem no G:\
 echo.
 
 set "ERRO_PASTA=0"
@@ -112,7 +112,8 @@ if "%ERRO_PASTA%"=="1" (
     exit /b 1
 )
 
-echo [OK] ☑️ Todas as pastas de origem foram validadas com sucesso!
+echo.
+echo ☑️ Verificação concluída!
 echo.
 
 
@@ -131,63 +132,108 @@ echo ===========================================================================
 :: /XX  -> (Exclude Extra): Impede que o Robocopy liste os arquivos que só existem no destino.
 :: /FFT -> Tolerância de 2 segundos na comparação de datas. Para casos em que são exibidos arquivos de rede mapeada com milissegundos de diferença.
 
-echo 📁 Copiando para Shop...
+echo ----------------------------------------------------------------------------------------------------
+echo 📁 Copiando arquivos
+echo Origem: "%ORIGEM1%" 
+echo Destino: "%DESTINO1%"
 robocopy "%ORIGEM1%" "%DESTINO1%" /E /ZB /R:1 /W:2 /NJH /NJS /NDL /XX /FFT /XD "SE"
 if errorlevel 8 goto ERRO
 
-echo 📁 Copiando para Biblioteca...
+echo ----------------------------------------------------------------------------------------------------
+echo 📁 Copiando arquivos
+echo Origem: "%ORIGEM2%" 
+echo Destino: "%DESTINO2%"
 robocopy "%ORIGEM2%" "%DESTINO2%" /E /ZB /R:1 /W:2 /NJH /NJS /NDL /XX /FFT /XD "DCP"
 if errorlevel 8 goto ERRO
 
-echo 📁 Copiando para Biblioteca...
+echo ----------------------------------------------------------------------------------------------------
+echo 📁 Copiando arquivos
+echo Origem: "%ORIGEM3%" 
+echo Destino: "%DESTINO3%"
 robocopy "%ORIGEM3%" "%DESTINO3%" /E /ZB /R:1 /W:2 /NJH /NJS /NDL /XX /FFT /XF "AltShopProc_IntegracaoOrcamentoPDALogicalAFV.exe" /XD "dcp_Alexandria" "dcp" "dcp_Tokyo" "dcus"
 if errorlevel 8 goto ERRO
 
-echo 📁 Copiando para Biblioteca...
+echo ----------------------------------------------------------------------------------------------------
+echo 📁 Copiando arquivos
+echo Origem: "%ORIGEM4%" 
+echo Destino: "%DESTINO4%"
 robocopy "%ORIGEM4%" "%DESTINO4%" /E /ZB /R:1 /W:2 /NJH /NJS /NDL /XX /FFT /XD "dcp_Alexandria" "DCP"
 if errorlevel 8 goto ERRO
 
-echo 📁 Copiando para Muven...
+echo ----------------------------------------------------------------------------------------------------
+echo 📁 Copiando arquivos
+echo Origem: "%ORIGEM5%" 
+echo Destino: "%DESTINO5%"
 robocopy "%ORIGEM5%" "%DESTINO5%" "AltShopProc_IntegradorMuven.exe" "AltShopProc_IntegradorMuven.jar" /ZB /R:1 /W:2 /NJH /NJS /NDL /XX /FFT
 if errorlevel 8 goto ERRO
 
-echo 📁 Copiando para MinhaEmpresa...
+echo ----------------------------------------------------------------------------------------------------
+echo 📁 Copiando arquivos
+echo Origem: "%ORIGEM6%" 
+echo Destino: "%DESTINO6%"
 robocopy "%ORIGEM6%" "%DESTINO6%" "AltShopProc_IntegradorMinhaEmpresa.exe" "AltShopProc_IntegradorMinhaEmpresa.jar" /ZB /R:1 /W:2 /NJH /NJS /NDL /XX /FFT
 if errorlevel 8 goto ERRO
 
-echo 📁 Copiando para Biblioteca...
+echo ----------------------------------------------------------------------------------------------------
+echo 📁 Copiando arquivos
+echo Origem: "%ORIGEM7%" 
+echo Destino: "%DESTINO7%"
 robocopy "%ORIGEM7%" "%DESTINO7%" /E /ZB /R:1 /W:2 /NJH /NJS /NDL /XX /FFT /XD "AQTime" "DCP"
 if errorlevel 8 goto ERRO
 
-echo 📁 Copiando para Shop...
+echo ----------------------------------------------------------------------------------------------------
+echo 📁 Copiando arquivos
+echo Origem: "%ORIGEM8%" 
+echo Destino: "%DESTINO8%"
 robocopy "%ORIGEM8%" "%DESTINO8%" /E /ZB /R:1 /W:2 /NJH /NJS /NDL /XX /FFT /XF "AltShopProc_ExportadorAccera.exe" "AltShopRelAD_PedidosGrade.exe" "AltShop_MichelinDRE.exe" "AltShop_RelatorioAD_SuplementarGradeFlex.exe" /XD "AD" "Dracena" "Enjoy" "HB" "RaquelCalcados" "ShellBrasil"
 if errorlevel 8 goto ERRO
 
-echo 📁 Copiando para Biblioteca...
+echo ----------------------------------------------------------------------------------------------------
+echo 📁 Copiando arquivos
+echo Origem: "%ORIGEM9%" 
+echo Destino: "%DESTINO9%"
 robocopy "%ORIGEM9%" "%DESTINO9%" "AltView.exe" /ZB /R:1 /W:2 /NJH /NJS /NDL /XX /FFT
 if errorlevel 8 goto ERRO
 
-echo 📁 Copiando para Modulos...
+echo ----------------------------------------------------------------------------------------------------
+echo 📁 Copiando arquivos
+echo Origem: "%ORIGEM10%" 
+echo Destino: "%DESTINO10%"
 robocopy "%ORIGEM10%" "%DESTINO10%" "AltConfigDBDiamond.exe" "AltModuloRegistradorShop.exe" "AltRegModGroupShop.exe" "AltShopProc_RegistraModulo.exe" /ZB /R:1 /W:2 /NJH /NJS /NDL /XX /FFT
 if errorlevel 8 goto ERRO
 
-echo 📁 Copiando para SysWOW64...
+echo ----------------------------------------------------------------------------------------------------
+echo 📁 Copiando arquivos
+echo Origem: "%ORIGEM11%" 
+echo Destino: "%DESTINO11%"
 robocopy "%ORIGEM11%" "%DESTINO11%" "AltConfigDBDiamond.exe" "AltConfigDBDiamond.cpl" "AltView.exe" /ZB /R:1 /W:2 /NJH /NJS /NDL /XX /FFT
 if errorlevel 8 goto ERRO
 
-echo 📁 Copiando para Shop...
+echo ----------------------------------------------------------------------------------------------------
+echo 📁 Copiando arquivos
+echo Origem: "%ORIGEM12%" 
+echo Destino: "%DESTINO12%"
 robocopy "%ORIGEM12%" "%DESTINO12%" /E /ZB /R:1 /W:2 /NJH /NJS /NDL /XX /FFT /XD "Cenarios" "NFCeINI" "Teste" "AQTime"
 if errorlevel 8 goto ERRO
 
-echo 📁 Copiando para Shop...
+echo ----------------------------------------------------------------------------------------------------
+echo 📁 Copiando arquivos
+echo Origem: "%ORIGEM13%" 
+echo Destino: "%DESTINO13%"
 robocopy "%ORIGEM13%" "%DESTINO13%" /E /ZB /R:1 /W:2 /NJH /NJS /NDL /XX /FFT /XD "AQTime" "Student"
 if errorlevel 8 goto ERRO
 
-echo 📁 Copiando para Shop...
+echo ----------------------------------------------------------------------------------------------------
+echo 📁 Copiando arquivos
+echo Origem: "%ORIGEM14%" 
+echo Destino: "%DESTINO14%"
 robocopy "%ORIGEM14%" "%DESTINO14%" /E /ZB /R:1 /W:2 /NJH /NJS /NDL /XX /FFT /XF "AltShopProc_AtualizaFollowUp.dll" "AltShop_ImportadorShop.exe"
 if errorlevel 8 goto ERRO
 
-echo 📁 Copiando para Biblioteca...
+echo ----------------------------------------------------------------------------------------------------
+echo 📁 Copiando arquivos
+echo Origem: "%ORIGEM15%" 
+echo Destino: "%DESTINO15%"
 robocopy "%ORIGEM15%" "%DESTINO15%" "AltShopProc_AtualizaFollowUp.dll" /ZB /R:1 /W:2 /NJH /NJS /NDL /XX /FFT
 if errorlevel 8 goto ERRO
 
@@ -208,7 +254,7 @@ if not exist "%~1" (
     echo ❌ ERRO: Pasta não encontrada ❌         ▶️ "%~1"
     set "ERRO_PASTA=1"
 ) else (
-    echo  [OK] Pasta encontrada       📁 "%~2" .
+    echo  [OK] Pasta encontrada       📁 %~2 .
 )
 goto :eof
 ::FUNÇÕES DECLARADAS - FIM

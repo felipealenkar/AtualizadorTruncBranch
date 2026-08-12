@@ -14,16 +14,16 @@ type
     mmoMemoLog: TMemo;
     PnlFiltros: TPanel;
     LblSistema: TLabel;
-    LblBranchLib: TLabel;
     CbbSistema: TComboBox;
     BtnAtualizar: TButton;
     RgCompilacao: TRadioGroup;
-    LbxVersoes: TListBox;
-    BtnAdicionarVersao: TButton;
     VImgLImagensMenores: TVirtualImageList;
+    PnlLog: TPanel;
+    GrpVersoes: TGroupBox;
+    BtnAdicionarVersao: TButton;
     BtnRemoverVersao: TButton;
     BtnLimparVersoes: TButton;
-    PnlLog: TPanel;
+    LbxVersoes: TListBox;
     procedure BtnAtualizarClick(Sender: TObject);
     procedure RgCompilacaoClick(Sender: TObject);
     procedure FormShow(Sender: TObject);
@@ -138,8 +138,8 @@ begin
       BtnAdicionarVersao.Enabled := False;
       BtnRemoverVersao.Enabled := False;
       BtnLimparVersoes.Enabled := False;
-      LblBranchLib.Enabled := False;
-      LblBranchLib.Caption := EmptyStr;
+      GrpVersoes.Enabled := False;
+      GrpVersoes.Caption := EmptyStr;
       LbxVersoes.ItemIndex := -1;
       FNomeArquivoBat := BAT_TRUNK_SHOP;
       LbxVersoes.Items.Clear;
@@ -150,8 +150,8 @@ begin
       BtnAdicionarVersao.Enabled := False;
       BtnRemoverVersao.Enabled := False;
       BtnLimparVersoes.Enabled := False;
-      LblBranchLib.Enabled := False;
-      LblBranchLib.Caption := EmptyStr;
+      GrpVersoes.Enabled := False;
+      GrpVersoes.Caption := EmptyStr;
       LbxVersoes.ItemIndex := -1;
       FNomeArquivoBat := BAT_TRUNK_SHOP_SIMPLES;
       LbxVersoes.Items.Clear;
@@ -162,8 +162,8 @@ begin
       BtnAdicionarVersao.Enabled := True;
       BtnRemoverVersao.Enabled := True;
       BtnLimparVersoes.Enabled := True;
-      LblBranchLib.Enabled := True;
-      LblBranchLib.Caption := 'Versão da Lib Shop compatível';
+      GrpVersoes.Enabled := True;
+      GrpVersoes.Caption := 'Versão da Lib Shop compatível';
       LbxVersoes.ItemIndex := -1;
       FNomeArquivoBat := BAT_TRUNK_PDV;
       FBuscaVersoes := PREFIXO_WSHOP; //Aqui é Wshop pois queremos a versão da Lib do Wshop mesmo
@@ -176,8 +176,8 @@ begin
     BtnAdicionarVersao.Enabled := True;
     BtnRemoverVersao.Enabled := True;
     BtnLimparVersoes.Enabled := True;
-    LblBranchLib.Enabled := True;
-    LblBranchLib.Caption := 'Versão da Branch';
+    GrpVersoes.Enabled := True;
+    GrpVersoes.Caption := 'Versão da Branch';
 
     if FSistemaEscolhido = SISTEMA_ISHOP_WSHOP then
     begin
@@ -221,7 +221,7 @@ begin
        (FSistemaEscolhido = SISTEMA_PDV_Alterdata)) or (RgCompilacao.ItemIndex = RgCompilacao.Items.IndexOf(COMPILACAO_BRANCH)) then
     begin
       if LbxVersoes.ItemIndex < 0 then
-        LLista.Add('- ' + LblBranchLib.Caption);
+        LLista.Add('- ' + GrpVersoes.Caption);
     end;
 
     Result := LLista.Count = 0;
@@ -273,6 +273,25 @@ var
   LLinhaPendente, LTexto: UTF8String;
   LTextoRestante: string;
   LPos: Integer;
+  LUltimoPercentual, LPercentualAtual: Integer;
+  LMemoAlterado: Boolean;
+
+  function ExtrairPercentual(const PTexto: string): Integer;
+  var
+    LTxt: string;
+    LPontoPos: Integer;
+  begin
+    Result := -1;
+    if Pos('%', PTexto) = 0 then
+      Exit;
+    LTxt := Trim(StringReplace(PTexto, '%', '', [rfReplaceAll]));
+    LPontoPos := Pos('.', LTxt);
+    if LPontoPos > 0 then
+      LTxt := Copy(LTxt, 1, LPontoPos - 1);
+    if not TryStrToInt(Trim(LTxt), Result) then
+      Result := -1;
+  end;
+
 begin
   if not FileExists(PCaminhoBat) then
   begin
@@ -326,6 +345,7 @@ begin
       LStdOutWrite := 0;
 
       LLinhaPendente := '';
+      LUltimoPercentual := -1;
 
      // ===== INÍCIO DA PARTE CORRIGIDA PARA PROGRESSO / PORCENTAGEM =====
       SendMessage(mmoMemoLog.Handle, WM_SETREDRAW, 0, 0);
@@ -333,6 +353,8 @@ begin
         repeat
           if not ReadFile(LStdOutRead, LBuffer, BUFFER_SIZE, LBytesRead, nil) or (LBytesRead = 0) then
             Break;
+
+          LMemoAlterado := False;
 
           SetString(LTexto, LBuffer, LBytesRead);
           LLinhaPendente := LLinhaPendente + LTexto;
@@ -358,26 +380,41 @@ begin
 
             if LTextoRestante <> '' then
             begin
-              // Se a linha atual e a última linha do Memo contiverem '%',
-              // significa que é uma barra de progresso em andamento. Substituímos em vez de criar nova linha.
+              LPercentualAtual := ExtrairPercentual(LTextoRestante);
+
               if (mmoMemoLog.Lines.Count > 0) and
                  (Pos('%', mmoMemoLog.Lines[mmoMemoLog.Lines.Count - 1]) > 0) and
-                 (Pos('%', LTextoRestante) > 0) then
+                 (LPercentualAtual >= 0) then
               begin
-                mmoMemoLog.Lines[mmoMemoLog.Lines.Count - 1] := LTextoRestante;
+                // Continuação da barra de progresso: só redesenha a cada 5% (ou ao concluir 100%)
+                if (LUltimoPercentual < 0) or (LPercentualAtual - LUltimoPercentual >= 5) or (LPercentualAtual >= 100) then
+                begin
+                  mmoMemoLog.Lines[mmoMemoLog.Lines.Count - 1] := LTextoRestante;
+                  LUltimoPercentual := LPercentualAtual;
+                  LMemoAlterado := True;
+                end;
+                // senão, ignora silenciosamente (não redesenha, evita o flicker)
               end
               else
               begin
                 AdicionarLog(LTextoRestante);
+                LUltimoPercentual := LPercentualAtual; // -1 se não for linha de progresso
+                LMemoAlterado := True;
               end;
             end;
           end;
-
-          SendMessage(mmoMemoLog.Handle, WM_SETREDRAW, 1, 0);
-          mmoMemoLog.Invalidate;
-          SendMessage(mmoMemoLog.Handle, EM_SCROLLCARET, 0, 0);
-          Application.ProcessMessages;
-          SendMessage(mmoMemoLog.Handle, WM_SETREDRAW, 0, 0);
+          if LMemoAlterado then
+          begin
+            SendMessage(mmoMemoLog.Handle, WM_SETREDRAW, 1, 0);
+            mmoMemoLog.Invalidate;
+            SendMessage(mmoMemoLog.Handle, EM_SCROLLCARET, 0, 0);
+            Application.ProcessMessages;
+            SendMessage(mmoMemoLog.Handle, WM_SETREDRAW, 0, 0);
+          end
+          else
+          begin
+            Application.ProcessMessages; // mantém a UI responsiva mesmo sem redesenhar o Memo
+          end;
         until False;
       finally
         SendMessage(mmoMemoLog.Handle, WM_SETREDRAW, 1, 0);
@@ -386,8 +423,7 @@ begin
       // ===== FIM DA PARTE CORRIGIDA =====
 
       LTextoRestante := Trim(UTF8ToString(LLinhaPendente));
-      if LTextoRestante <> '' then
-        AdicionarLog(LTextoRestante);
+      AdicionarLog(LTextoRestante);
 
       WaitForSingleObject(LProcessInfo.hProcess, INFINITE);
       GetExitCodeProcess(LProcessInfo.hProcess, LExitCode);
@@ -477,7 +513,7 @@ procedure TFrmPrincipal.BtnLimparVersoesClick(Sender: TObject);
 var
   Resposta: Integer;
 begin
-  Resposta := MessageBox(Self.Handle, 'Deseja limpar todas as Branches?', 'Limpar Branches', MB_YESNO or MB_ICONQUESTION);
+  Resposta := MessageBox(Self.Handle, 'Deseja limpar todas as versões?', 'Limpar versões', MB_YESNO or MB_ICONQUESTION);
 
   if Resposta = IDYES then
   begin
@@ -487,7 +523,12 @@ begin
        (FSistemaEscolhido = SISTEMA_SHOP_SIMPLES) then
       GravarVersoesFavoritas(BRANCHES_FAVORITAS_SHOP)
     else if FSistemaEscolhido = SISTEMA_PDV_Alterdata then
-      GravarVersoesFavoritas(BRANCHES_FAVORITAS_PDV);
+    begin
+      if FCompilacaoEscolhida = COMPILACAO_TRUNK then
+        GravarVersoesFavoritas(LIBS_FAVORITAS_SHOP_PDV)
+      else if FCompilacaoEscolhida = COMPILACAO_BRANCH then
+        GravarVersoesFavoritas(BRANCHES_FAVORITAS_PDV);
+    end;
   end;
 end;
 
@@ -500,8 +541,13 @@ begin
     if (FSistemaEscolhido = SISTEMA_ISHOP_WSHOP) or
        (FSistemaEscolhido = SISTEMA_SHOP_SIMPLES) then
       GravarVersoesFavoritas(BRANCHES_FAVORITAS_SHOP)
-    else if FSistemaEscolhido = SISTEMA_PDV_Alterdata then
-      GravarVersoesFavoritas(BRANCHES_FAVORITAS_PDV);
+    else if (FSistemaEscolhido = SISTEMA_PDV_Alterdata) then
+    begin
+      if FCompilacaoEscolhida = COMPILACAO_TRUNK then
+        GravarVersoesFavoritas(LIBS_FAVORITAS_SHOP_PDV)
+      else if FCompilacaoEscolhida = COMPILACAO_BRANCH then
+        GravarVersoesFavoritas(BRANCHES_FAVORITAS_PDV);
+    end;
   end;
 end;
 

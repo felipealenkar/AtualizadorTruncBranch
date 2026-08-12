@@ -1,11 +1,12 @@
 object FrmPrincipal: TFrmPrincipal
   Left = 0
   Top = 0
+  Anchors = [akLeft, akTop, akRight]
   BorderIcons = [biSystemMenu, biMinimize]
   BorderStyle = bsSingle
   Caption = 'Atualizador Trunk/Branch'
   ClientHeight = 615
-  ClientWidth = 1342
+  ClientWidth = 1454
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -8469,34 +8470,26 @@ object FrmPrincipal: TFrmPrincipal
   object PnlFiltros: TPanel
     Left = 0
     Top = 0
-    Width = 369
+    Width = 342
     Height = 615
     Align = alLeft
     TabOrder = 0
     DesignSize = (
-      369
+      342
       615)
     object LblSistema: TLabel
-      Left = 15
+      Left = 7
       Top = 9
-      Width = 41
+      Width = 14
       Height = 15
       Anchors = [akLeft, akTop, akRight]
       Caption = 'Sistema'
-    end
-    object LblBranchLib: TLabel
-      Left = 15
-      Top = 170
-      Width = 338
-      Height = 15
-      Anchors = [akLeft, akTop, akRight]
-      AutoSize = False
-      Enabled = False
+      ExplicitWidth = 72
     end
     object CbbSistema: TComboBox
-      Left = 15
+      Left = 6
       Top = 30
-      Width = 338
+      Width = 330
       Height = 23
       Style = csDropDownList
       Anchors = [akLeft, akTop, akRight]
@@ -8504,10 +8497,11 @@ object FrmPrincipal: TFrmPrincipal
       OnChange = CbbSistemaChange
     end
     object BtnAtualizar: TButton
-      Left = 106
+      Left = 103
       Top = 520
       Width = 135
       Height = 81
+      Anchors = [akLeft, akBottom]
       Caption = 'Atualizar'
       ImageIndex = 0
       ImageName = 'Atualizar'
@@ -8517,9 +8511,9 @@ object FrmPrincipal: TFrmPrincipal
       OnClick = BtnAtualizarClick
     end
     object RgCompilacao: TRadioGroup
-      Left = 15
+      Left = 6
       Top = 73
-      Width = 338
+      Width = 330
       Height = 81
       Anchors = [akLeft, akTop, akRight]
       Caption = 'Compila'#231#227'o'
@@ -8530,77 +8524,92 @@ object FrmPrincipal: TFrmPrincipal
       TabOrder = 2
       OnClick = RgCompilacaoClick
     end
-    object LbxVersoes: TListBox
-      Left = 57
-      Top = 191
-      Width = 296
-      Height = 314
-      Enabled = False
-      ItemHeight = 15
-      Sorted = True
+    object GrpVersoes: TGroupBox
+      Left = 6
+      Top = 176
+      Width = 330
+      Height = 329
+      Caption = 'Vers'#245'es'
       TabOrder = 3
-    end
-    object BtnAdicionarVersao: TButton
-      Left = 15
-      Top = 191
-      Width = 36
-      Height = 36
-      Enabled = False
-      ImageIndex = 0
-      ImageName = 'Adicionar'
-      ImageMargins.Left = 1
-      ImageMargins.Top = 1
-      ImageMargins.Right = 1
-      ImageMargins.Bottom = 1
-      Images = VImgLImagensMenores
-      TabOrder = 4
-      OnClick = BtnAdicionarVersaoClick
-    end
-    object BtnRemoverVersao: TButton
-      Left = 15
-      Top = 233
-      Width = 36
-      Height = 36
-      Enabled = False
-      ImageIndex = 1
-      ImageName = 'Cancelar'
-      ImageMargins.Left = 1
-      ImageMargins.Top = 1
-      ImageMargins.Right = 1
-      ImageMargins.Bottom = 1
-      Images = VImgLImagensMenores
-      TabOrder = 5
-      OnClick = BtnRemoverVersaoClick
-    end
-    object BtnLimparVersoes: TButton
-      Left = 15
-      Top = 275
-      Width = 36
-      Height = 36
-      Enabled = False
-      ImageIndex = 2
-      ImageName = 'Limpar'
-      ImageMargins.Left = 1
-      ImageMargins.Top = 1
-      ImageMargins.Right = 1
-      ImageMargins.Bottom = 1
-      Images = VImgLImagensMenores
-      TabOrder = 6
-      OnClick = BtnLimparVersoesClick
+      DesignSize = (
+        330
+        329)
+      object BtnAdicionarVersao: TButton
+        Left = 6
+        Top = 24
+        Width = 36
+        Height = 36
+        Enabled = False
+        ImageIndex = 0
+        ImageName = 'Adicionar'
+        ImageMargins.Left = 1
+        ImageMargins.Top = 1
+        ImageMargins.Right = 1
+        ImageMargins.Bottom = 1
+        Images = VImgLImagensMenores
+        TabOrder = 0
+        OnClick = BtnAdicionarVersaoClick
+      end
+      object BtnRemoverVersao: TButton
+        Left = 6
+        Top = 66
+        Width = 36
+        Height = 36
+        Enabled = False
+        ImageIndex = 1
+        ImageName = 'Cancelar'
+        ImageMargins.Left = 1
+        ImageMargins.Top = 1
+        ImageMargins.Right = 1
+        ImageMargins.Bottom = 1
+        Images = VImgLImagensMenores
+        TabOrder = 1
+        OnClick = BtnRemoverVersaoClick
+      end
+      object BtnLimparVersoes: TButton
+        Left = 6
+        Top = 108
+        Width = 36
+        Height = 36
+        Enabled = False
+        ImageIndex = 2
+        ImageName = 'Limpar'
+        ImageMargins.Left = 1
+        ImageMargins.Top = 1
+        ImageMargins.Right = 1
+        ImageMargins.Bottom = 1
+        Images = VImgLImagensMenores
+        TabOrder = 2
+        OnClick = BtnLimparVersoesClick
+      end
+      object LbxVersoes: TListBox
+        Left = 47
+        Top = 24
+        Width = 237
+        Height = 289
+        Anchors = [akLeft, akTop, akRight, akBottom]
+        Enabled = False
+        ItemHeight = 15
+        Sorted = True
+        TabOrder = 3
+        ExplicitWidth = 277
+      end
     end
   end
   object PnlLog: TPanel
-    Left = 369
+    Left = 342
     Top = 0
-    Width = 973
+    Width = 1112
     Height = 615
     Align = alClient
     TabOrder = 1
+    ExplicitLeft = 369
+    ExplicitWidth = 973
     object mmoMemoLog: TMemo
       AlignWithMargins = True
       Left = 14
       Top = 14
-      Width = 945
+      Width = 1084
       Height = 587
       Margins.Left = 13
       Margins.Top = 13
@@ -8610,6 +8619,7 @@ object FrmPrincipal: TFrmPrincipal
       ReadOnly = True
       ScrollBars = ssVertical
       TabOrder = 0
+      ExplicitWidth = 945
     end
   end
   object VImgLImagens: TVirtualImageList

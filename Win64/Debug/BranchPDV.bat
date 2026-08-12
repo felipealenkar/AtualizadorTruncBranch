@@ -94,7 +94,7 @@ echo ==========================================================================
 echo VALIDAÇÃO DAS PASTAS DE ORIGEM
 echo ==========================================================================
 
-echo 🔍 [Validando Pastas] Verificando se os diretórios de origem existem no G:\...
+echo 🔍 Verificando se os diretórios de origem existem no G:\
 echo.
 
 set "ERRO_PASTA=0"
@@ -111,7 +111,8 @@ call :VERIFICAR_PASTA "%ORIGEM8%" "ORIGEM8"
 call :VERIFICAR_PASTA "%ORIGEM9%" "ORIGEM9"
 call :VERIFICAR_PASTA "%ORIGEM10%" "ORIGEM10"
 
-echo [OK] ☑️ Validação concluída! Processando cópias...
+echo.
+echo ☑️ Verificação concluída!
 echo.
 
 
@@ -131,61 +132,92 @@ echo ===========================================================================
 :: /FFT -> Tolerância de 2 segundos na comparação de datas. Para casos em que são exibidos arquivos de rede mapeada com milissegundos de diferença.
 
 if "%ORIGEM1_OK%"=="1" (
-	echo 📁 Copiando para Biblioteca...
+	echo ----------------------------------------------------------------------------------------------------
+	echo 📁 Copiando arquivos
+	echo Origem: "%ORIGEM1%" 
+	echo Destino: "%DESTINO1%"
+	echo ----------------------------------------------------------------------------------------------------
 	robocopy "%ORIGEM1%" "%DESTINO1%" /E /ZB /R:1 /W:2 /NJH /NJS /NDL /XX /FFT /XD "DCP" "PLUGIN"
 	if errorlevel 8 goto ERRO
 )
 
 if "%ORIGEM2_OK%"=="1" (
-	echo 📁 Copiando para MODPDV...
+	echo ----------------------------------------------------------------------------------------------------
+	echo 📁 Copiando arquivos
+	echo Origem: "%ORIGEM2%" 
+	echo Destino: "%DESTINO2%"
 	robocopy "%ORIGEM2%" "%DESTINO2%" /E /ZB /R:1 /W:2 /NJH /NJS /NDL /XX /FFT /XD "ERP"
 	if errorlevel 8 goto ERRO
 )
 
 if "%ORIGEM3_OK%"=="1" (
-	echo 📁 Copiando para Biblioteca...
+	echo ----------------------------------------------------------------------------------------------------
+	echo 📁 Copiando arquivos
+	echo Origem: "%ORIGEM3%" 
+	echo Destino: "%DESTINO3%"
 	robocopy "%ORIGEM3%" "%DESTINO3%" /E /ZB /R:1 /W:2 /NJH /NJS /NDL /XX /FFT
 	if errorlevel 8 goto ERRO
 )
 
 if "%ORIGEM4_OK%"=="1" (
-	echo 📁 Copiando para Concentrador...
+	echo ----------------------------------------------------------------------------------------------------
+	echo 📁 Copiando arquivos
+	echo Origem: "%ORIGEM4%" 
+	echo Destino: "%DESTINO4%"
 	robocopy "%ORIGEM4%" "%DESTINO4%" /E /ZB /R:1 /W:2 /NJH /NJS /NDL /XX /FFT /XF "*.AR1" "*.AR2" "AltShop_AgenteTerminalPreVenda.exe" "AltShop_GeradorCargaBalancaPDV.exe" "AltShop_GeradorDeArquivos.exe" "AltShop_GerenciadorNotas.exe" "AltShop_ImpressaoEtiquetasOffLine.exe" "AltShop_InutilizacaoFaixaNFCe.exe" "AltShopConfCegaPDV.exe" "AltShopConfigSrvPDV.exe" "AltShopProc_AbreDat.exe" "AltShopServicePDV.exe" "CertDataControl.ach" "ConcentradorGuardian.exe" "ConverterDatEmJson.exe" "ImpressaoDanfeNFCe.exe" "IntegradorPreVendaPDV.exe" "LiberaECF.exe" "PDVAlterdata.exe" "PinPadFinder.exe" "RecuperadorSQLite.exe" "TotenMarket.exe" "WinCertCtrl.ach" /XD "Nota_Facil"
 	if errorlevel 8 goto ERRO
 )
 
 if "%ORIGEM5_OK%"=="1" (
-	echo 📁 Copiando para ConfiguradorPDV...
+	echo ----------------------------------------------------------------------------------------------------
+	echo 📁 Copiando arquivos
+	echo Origem: "%ORIGEM5%" 
+	echo Destino: "%DESTINO5%"
 	robocopy "%ORIGEM5%" "%DESTINO5%" /E /ZB /R:1 /W:2 /NJH /NJS /NDL /XX /FFT /XF "*.AR1" "*.AR2" "AltShop_AgenteTerminalPreVenda.exe" "AltShop_ConfigBasePadrao.exe" "Altshop_ConfigServidorOffLineCloud.exe" "AltShop_ConfiguradorSchemaPluginPDV.exe" "AltShop_GeradorDeArquivos.exe" "AltShop_GerenciadorNotas.exe" "AltShop_InutilizacaoFaixaNFCe.exe" "AltShop_ServidorOFFLineCloud.exe" "AltShopProc_AbreDat.exe" "CertDataControl.ach" "ConverterDatEmJson.exe" "ExpOffLine.exe" "ImpOffLine.exe" "ImpressaoDanfeNFCe.exe" "IntegradorPreVendaPDV.exe" "LiberaECF.exe" "PDVAlterdata.exe" "PinPadFinder.exe" "RecuperadorSQLite.exe" "ServidorOffLine.exe" "ServidorOffLineGuardian.exe" "ServidorOffLineSvc.exe" "TotenMarket.exe" "WinCertCtrl.ach" /XD "Nota_Facil"
 	if errorlevel 8 goto ERRO
 )
 
 if "%ORIGEM6_OK%"=="1" (
-	echo 📁 Copiando para PDV Alterdata...
+	echo ----------------------------------------------------------------------------------------------------
+	echo 📁 Copiando arquivos
+	echo Origem: "%ORIGEM6%" 
+	echo Destino: "%DESTINO6%"
 	robocopy "%ORIGEM6%" "%DESTINO6%" /E /ZB /R:1 /W:2 /NJH /NJS /NDL /XX /FFT /XF "*.AR1" "*.AR2" "AltShop_AgenteTerminalPreVenda.exe" "Altshop_ConfigServidorOffLineCloud.exe" "AltShop_ConfiguradorSchemaPluginPDV.exe" "AltShop_ImpressaoEtiquetasOffLine.exe" "AltShop_ServidorOFFLineCloud.exe" "AltShopConfigSrvPDV.exe" "AltShopServicePDV.exe" "CertDataControl.ach" "ConcentradorGuardian.exe" "IntegradorPreVendaPDV.exe" "ServidorOffLineSvc.exe" "WinCertCtrl.ach" /XD "Nota_Facil"
 	if errorlevel 8 goto ERRO
 )
 
 if "%ORIGEM7_OK%"=="1" (
-	echo 📁 Copiando para PreVenda...
+	echo ----------------------------------------------------------------------------------------------------
+	echo 📁 Copiando arquivos
+	echo Origem: "%ORIGEM7%" 
+	echo Destino: "%DESTINO7%"
 	robocopy "%ORIGEM7%" "%DESTINO7%" /E /ZB /R:1 /W:2 /NJH /NJS /NDL /XX /FFT /XF "*.AR1" "*.AR2" "AltShop_ConfigBasePadrao.exe" "Altshop_ConfigServidorOffLineCloud.exe" "AltShop_ConfiguradorSchemaPluginPDV.exe" "AltShop_GeradorCargaBalancaPDV.exe" "AltShop_GeradorDeArquivos.exe" "AltShop_GerenciadorNotas.exe" "AltShop_ImpressaoEtiquetasOffLine.exe" "AltShop_InutilizacaoFaixaNFCe.exe" "AltShop_ServidorOFFLineCloud.exe" "AltShopConfCegaPDV.exe" "AltShopConfigSrvPDV.exe" "AltShopProc_AbreDat.exe" "AltShopServicePDV.exe" "CertDataControl.ach" "ConcentradorGuardian.exe" "ConverterDatEmJson.exe" "ExpOffLine.exe" "ImpOffLine.exe" "ImpressaoDanfeNFCe.exe" "LiberaECF.exe" "PDVAlterdata.exe" "PinPadFinder.exe" "RecuperadorSQLite.exe" "ServidorOffLine.exe" "ServidorOffLineGuardian.exe" "ServidorOffLineSvc.exe" "TotenMarket.exe" "WinCertCtrl.ach" /XD "Nota_Facil"
 	if errorlevel 8 goto ERRO
 )
 
 if "%ORIGEM8_OK%"=="1" (
-	echo 📁 Copiando para Lays...
+	echo ----------------------------------------------------------------------------------------------------
+	echo 📁 Copiando arquivos
+	echo Origem: "%ORIGEM8%" 
+	echo Destino: "%DESTINO8%"
 	robocopy "%ORIGEM8%" "%DESTINO8%" /E /ZB /R:1 /W:2 /NJH /NJS /NDL /XX /FFT /XD "Rtm_NFCe" "Rtm_Venda_Futura"
 	if errorlevel 8 goto ERRO
 )
 
 if "%ORIGEM9_OK%"=="1" (
-	echo 📁 Copiando para DanfeNFCe...
+	echo ----------------------------------------------------------------------------------------------------
+	echo 📁 Copiando arquivos
+	echo Origem: "%ORIGEM9%" 
+	echo Destino: "%DESTINO9%"
 	robocopy "%ORIGEM9%" "%DESTINO9%" /E /ZB /R:1 /W:2 /NJH /NJS /NDL /XX /FFT
 	if errorlevel 8 goto ERRO
 )
 
 if "%ORIGEM10_OK%"=="1" (
-	echo 📁 Copiando para VendaFutura...
+	echo ----------------------------------------------------------------------------------------------------
+	echo 📁 Copiando arquivos
+	echo Origem: "%ORIGEM10%" 
+	echo Destino: "%DESTINO10%"
 	robocopy "%ORIGEM10%" "%DESTINO10%" /E /ZB /R:1 /W:2 /NJH /NJS /NDL /XX /FFT
 	if errorlevel 8 goto ERRO
 )

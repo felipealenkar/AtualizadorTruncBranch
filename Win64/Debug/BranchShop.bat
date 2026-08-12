@@ -112,7 +112,7 @@ set "DESTINO16=C:\Program Files (x86)\Alterdata\Shop %VERSAO_BRANCH%"
 :: VALIDAÇÃO DAS PASTAS DE ORIGEM
 :: -------------------------------------------------------------------------
 
-echo 🔍 [Validando Pastas] Verificando se os diretórios de origem existem no G:\...
+echo 🔍 Verificando se os diretórios de origem existem no G:\
 echo.
 
 set "ERRO_PASTA=0"
@@ -135,8 +135,8 @@ call :VERIFICAR_PASTA "%ORIGEM14%" "ORIGEM14"
 call :VERIFICAR_PASTA "%ORIGEM15%" "ORIGEM15"
 call :VERIFICAR_PASTA "%ORIGEM16%" "ORIGEM16"
 
-
-echo [OK] ☑️ Validação concluída! Processando cópias...
+echo.
+echo ☑️ Verificação concluída!
 echo.
 
 
@@ -156,97 +156,145 @@ echo ===========================================================================
 :: /FFT -> Tolerância de 2 segundos na comparação de datas. Para casos em que são exibidos arquivos de rede mapeada com milissegundos de diferença.
 
 if "%ORIGEM1_OK%"=="1" (
-	echo 📁 Copiando para Shop...
+	echo ----------------------------------------------------------------------------------------------------
+	echo 📁 Copiando arquivos
+	echo Origem: "%ORIGEM1%" 
+	echo Destino: "%DESTINO1%"
 	robocopy "%ORIGEM1%" "%DESTINO1%" /E /ZB /R:1 /W:2 /NJH /NJS /NDL /XX /FFT /XD "SE"
 	if errorlevel 8 goto ERRO
 )
 
 if "%ORIGEM2_OK%"=="1" (
-	echo 📁 Copiando para Biblioteca...
+	echo ----------------------------------------------------------------------------------------------------
+	echo 📁 Copiando arquivos
+	echo Origem: "%ORIGEM2%" 
+	echo Destino: "%DESTINO2%"
 	robocopy "%ORIGEM2%" "%DESTINO2%" /E /ZB /R:1 /W:2 /NJH /NJS /NDL /XX /FFT /XD "DCP"
 	if errorlevel 8 goto ERRO
 )
 
 if "%ORIGEM3_OK%"=="1" (
-	echo 📁 Copiando para Biblioteca...
+	echo ----------------------------------------------------------------------------------------------------
+	echo 📁 Copiando arquivos
+	echo Origem: "%ORIGEM3%" 
+	echo Destino: "%DESTINO3%"
 	robocopy "%ORIGEM3%" "%DESTINO3%" /E /ZB /R:1 /W:2 /NJH /NJS /NDL /XX /FFT /XD "dcp_Alexandria"
 	if errorlevel 8 goto ERRO
 )
 
 if "%ORIGEM4_OK%"=="1" (
-	echo 📁 Copiando para Biblioteca...
+	echo ----------------------------------------------------------------------------------------------------
+	echo 📁 Copiando arquivos
+	echo Origem: "%ORIGEM4%" 
+	echo Destino: "%DESTINO4%"
 	robocopy "%ORIGEM4%" "%DESTINO4%" /E /ZB /R:1 /W:2 /NJH /NJS /NDL /XX /FFT /XD "DCP"
 	if errorlevel 8 goto ERRO
 )
 
 if "%ORIGEM5_OK%"=="1" (
-	echo 📁 Copiando para Muven...
+	echo ----------------------------------------------------------------------------------------------------
+	echo 📁 Copiando arquivos
+	echo Origem: "%ORIGEM5%" 
+	echo Destino: "%DESTINO5%"
 	robocopy "%ORIGEM5%" "%DESTINO5%" /E /ZB /R:1 /W:2 /NJH /NJS /NDL /XX /FFT
 	if errorlevel 8 goto ERRO
 )
 
 if "%ORIGEM6_OK%"=="1" (
-	echo 📁 Copiando para Biblioteca...
+	echo ----------------------------------------------------------------------------------------------------
+	echo 📁 Copiando arquivos
+	echo Origem: "%ORIGEM6%" 
+	echo Destino: "%DESTINO6%"
 	robocopy "%ORIGEM6%" "%DESTINO6%" /E /ZB /R:1 /W:2 /NJH /NJS /NDL /XX /FFT
 	if errorlevel 8 goto ERRO
 )
 
 if "%ORIGEM7_OK%"=="1" (
-	echo 📁 Copiando para Shop...
+	echo ----------------------------------------------------------------------------------------------------
+	echo 📁 Copiando arquivos
+	echo Origem: "%ORIGEM7%" 
+	echo Destino: "%DESTINO7%"
 	robocopy "%ORIGEM7%" "%DESTINO7%" /E /ZB /R:1 /W:2 /NJH /NJS /NDL /XX /FFT
 	if errorlevel 8 goto ERRO
 )
 
 if "%ORIGEM8_OK%"=="1" (
-	echo 📁 Copiando para Lays...
+	echo ----------------------------------------------------------------------------------------------------
+	echo 📁 Copiando arquivos
+	echo Origem: "%ORIGEM8%" 
+	echo Destino: "%DESTINO8%"
 	robocopy "%ORIGEM8%" "%DESTINO8%" /E /ZB /R:1 /W:2 /NJH /NJS /NDL /XX /FFT /XD "Rtm_Venda_Futura"
 	if errorlevel 8 goto ERRO
 )
 
 if "%ORIGEM9_OK%"=="1" (
-	echo 📁 Copiando para DanfeNFCe...
+	echo ----------------------------------------------------------------------------------------------------
+	echo 📁 Copiando arquivos
+	echo Origem: "%ORIGEM9%" 
+	echo Destino: "%DESTINO9%"
 	robocopy "%ORIGEM9%" "%DESTINO9%" /E /ZB /R:1 /W:2 /NJH /NJS /NDL /XX /FFT
 	if errorlevel 8 goto ERRO
 )
 
 if "%ORIGEM10_OK%"=="1" (
-	echo 📁 Copiando para Biblioteca...
+	echo ----------------------------------------------------------------------------------------------------
+	echo 📁 Copiando arquivos
+	echo Origem: "%ORIGEM10%" 
+	echo Destino: "%DESTINO10%".
 	robocopy "%ORIGEM10%" "%DESTINO10%" /E /ZB /R:1 /W:2 /NJH /NJS /NDL /XX /FFT
 	if errorlevel 8 goto ERRO
 )
 
 if "%ORIGEM11_OK%"=="1" (
-	echo 📁 Copiando para Shop...
+	echo ----------------------------------------------------------------------------------------------------
+	echo 📁 Copiando arquivos
+	echo Origem: "%ORIGEM11%" 
+	echo Destino: "%DESTINO11%".
 	robocopy "%ORIGEM11%" "%DESTINO11%" /E /ZB /R:1 /W:2 /NJH /NJS /NDL /XX /FFT
 	if errorlevel 8 goto ERRO
 )
 
 if "%ORIGEM12_OK%"=="1" (
-	echo 📁 Copiando para Modulos...
+	echo ----------------------------------------------------------------------------------------------------
+	echo 📁 Copiando arquivos
+	echo Origem: "%ORIGEM12%" 
+	echo Destino: "%DESTINO12%"
 	robocopy "%ORIGEM12%" "%DESTINO12%" "AltConfigDBDiamond.exe" "AltModuloRegistradorShop.exe" "AltRegModGroupShop.exe" "AltShopProc_RegistraModulo.exe" /ZB /R:1 /W:2 /NJH /NJS /NDL /XX /FFT
 	if errorlevel 8 goto ERRO
 )
 
 if "%ORIGEM13_OK%"=="1" (
-	echo 📁 Copiando para SysWOW64...
+	echo ----------------------------------------------------------------------------------------------------
+	echo 📁 Copiando arquivos
+	echo Origem: "%ORIGEM13%" 
+	echo Destino: "%DESTINO13%"
 	robocopy "%ORIGEM13%" "%DESTINO13%" "AltConfigDBDiamond.exe" "AltConfigDBDiamond.cpl" /ZB /R:1 /W:2 /NJH /NJS /NDL /XX /FFT
 	if errorlevel 8 goto ERRO
 )
 
 if "%ORIGEM14_OK%"=="1" (
-	echo 📁 Copiando para Shop...
+	echo ----------------------------------------------------------------------------------------------------
+	echo 📁 Copiando arquivos
+	echo Origem: "%ORIGEM14%" 
+	echo Destino: "%DESTINO14%"
 	robocopy "%ORIGEM14%" "%DESTINO14%" /E /ZB /R:1 /W:2 /NJH /NJS /NDL /XX /FFT
 	if errorlevel 8 goto ERRO
 )
 
 if "%ORIGEM15_OK%"=="1" (
-	echo 📁 Copiando para Shop...
+	echo ----------------------------------------------------------------------------------------------------
+	echo 📁 Copiando arquivos
+	echo Origem: "%ORIGEM15%" 
+	echo Destino: "%DESTINO15%"
 	robocopy "%ORIGEM15%" "%DESTINO15%" /E /ZB /R:1 /W:2 /NJH /NJS /NDL /XX /FFT
 	if errorlevel 8 goto ERRO
 )
 
 if "%ORIGEM16_OK%"=="1" (
-	echo 📁 Copiando para Shop...
+	echo ----------------------------------------------------------------------------------------------------
+	echo 📁 Copiando arquivos
+	echo Origem: "%ORIGEM16%" 
+	echo Destino: "%DESTINO16%"
 	robocopy "%ORIGEM16%" "%DESTINO16%" /E /ZB /R:1 /W:2 /NJH /NJS /NDL /XX /FFT
 	if errorlevel 8 goto ERRO
 )
