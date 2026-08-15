@@ -18,20 +18,6 @@ if "%~1"=="" (
     exit /b 1
 )
 
-if "%~2"=="" (
-    color 0C
-    echo ====================================================================================================
-    echo ❌ ERRO: VERSAO DA BRANCH NAO FOI INFORMADA!
-    echo ====================================================================================================
-    echo.
-    echo Uso: BranchPDV.bat "NomeBranch" "VersaoBranch"
-    echo.
-    pause >nul
-    exit /b 1
-)
-set "NOME_BRANCH=%~1"
-set "VERSAO_BRANCH=%~2"
-
 :: -------------------------------------------------------------------------
 :: VERIFICAÇÃO RIGOROSA DE ADMINISTRADOR
 :: -------------------------------------------------------------------------
@@ -52,47 +38,59 @@ if %errorlevel% neq 0 (
     exit /b
 )
 
-echo ========================================================================================================
+set "NOME_BRANCH=%~1"
+set "VERSAO_BRANCH=%~2"
+
+if "%VERSAO_BRANCH%"=="" (
+    set "SUFIXO_VERSAO="
+	set "MSG_VERSAO=DIRETÓRIOS ORIGINAIS"
+) else (
+    set "SUFIXO_VERSAO= %VERSAO_BRANCH%"
+	set "MSG_VERSAO=DIRETÓRIOS PERSONALIZADOS COM O SUFIXO %VERSAO_BRANCH%"
+)
+
+echo ====================================================================================================
 echo            INICIANDO ATUALIZAÇÃO DA BRANCH PDV: %NOME_BRANCH%
-echo ========================================================================================================
+echo            DESTINO: %MSG_VERSAO%
+echo ====================================================================================================
 echo.
 
 :: CONFIGURAÇÃO DOS CAMINHOS
 
 set "ORIGEM1=G:\ALTERDAT\Versoes\wshop\Hudson\branches\%NOME_BRANCH%\BPL\Alexandria\PDV"
-set "DESTINO1=C:\Program Files (x86)\Alterdata\Biblioteca %VERSAO_BRANCH%"
+set "DESTINO1=C:\Program Files (x86)\Alterdata\Biblioteca%SUFIXO_VERSAO%"
 
 set "ORIGEM2=G:\ALTERDAT\Versoes\wshop\Hudson\branches\%NOME_BRANCH%\BPL\Alexandria\PDV\PLUGIN"
-set "DESTINO2=C:\Program Files (x86)\Alterdata\PDV Alterdata %VERSAO_BRANCH%\MODPDV"
+set "DESTINO2=C:\Program Files (x86)\Alterdata\PDV Alterdata%SUFIXO_VERSAO%\MODPDV"
 
 set "ORIGEM3=G:\ALTERDAT\Versoes\wshop\Hudson\branches\%NOME_BRANCH%\PdvAlterdata\DLL\Alexandria"
-set "DESTINO3=C:\Program Files (x86)\Alterdata\Biblioteca %VERSAO_BRANCH%"
+set "DESTINO3=C:\Program Files (x86)\Alterdata\Biblioteca%SUFIXO_VERSAO%"
 
 set "ORIGEM4=G:\ALTERDAT\Versoes\wshop\Hudson\branches\%NOME_BRANCH%\PdvAlterdata\Exe\Alexandria"
-set "DESTINO4=C:\Program Files (x86)\Alterdata\Concentrador %VERSAO_BRANCH%"
+set "DESTINO4=C:\Program Files (x86)\Alterdata\Concentrador%SUFIXO_VERSAO%"
 
 set "ORIGEM5=G:\ALTERDAT\Versoes\wshop\Hudson\branches\%NOME_BRANCH%\PdvAlterdata\Exe\Alexandria"
-set "DESTINO5=C:\Program Files (x86)\Alterdata\Concentrador %VERSAO_BRANCH%\Exe\IntegradorPDV"
+set "DESTINO5=C:\Program Files (x86)\Alterdata\Concentrador%SUFIXO_VERSAO%\Exe\IntegradorPDV"
 
 set "ORIGEM6=G:\ALTERDAT\Versoes\wshop\Hudson\branches\%NOME_BRANCH%\PdvAlterdata\Exe\Alexandria"
-set "DESTINO6=C:\Program Files (x86)\Alterdata\PDV Alterdata %VERSAO_BRANCH%"
+set "DESTINO6=C:\Program Files (x86)\Alterdata\PDV Alterdata%SUFIXO_VERSAO%"
 
 set "ORIGEM7=G:\ALTERDAT\Versoes\wshop\Hudson\branches\%NOME_BRANCH%\PdvAlterdata\Exe\Alexandria"
-set "DESTINO7=C:\Program Files (x86)\Alterdata\PreVenda %VERSAO_BRANCH%"
+set "DESTINO7=C:\Program Files (x86)\Alterdata\PreVenda%SUFIXO_VERSAO%"
 
 set "ORIGEM8=G:\ALTERDAT\Versoes\wshop\Hudson\branches\%NOME_BRANCH%\PdvAlterdata\Lays\Alexandria"
-set "DESTINO8=C:\Program Files (x86)\Alterdata\PDV Alterdata %VERSAO_BRANCH%\Lays"
+set "DESTINO8=C:\Program Files (x86)\Alterdata\PDV Alterdata%SUFIXO_VERSAO%\Lays"
 
 set "ORIGEM9=G:\ALTERDAT\Versoes\wshop\Hudson\branches\%NOME_BRANCH%\PdvAlterdata\Lays\Alexandria\Rtm_NFCe"
-set "DESTINO9=C:\Program Files (x86)\Alterdata\PDV Alterdata %VERSAO_BRANCH%\Lays\DanfeNFCe"
+set "DESTINO9=C:\Program Files (x86)\Alterdata\PDV Alterdata%SUFIXO_VERSAO%\Lays\DanfeNFCe"
 
 set "ORIGEM10=G:\ALTERDAT\Versoes\wshop\Hudson\branches\%NOME_BRANCH%\PdvAlterdata\Lays\Alexandria\Rtm_Venda_Futura"
-set "DESTINO10=C:\Program Files (x86)\Alterdata\PDV Alterdata %VERSAO_BRANCH%\Lays\VendaFutura"
+set "DESTINO10=C:\Program Files (x86)\Alterdata\PDV Alterdata%SUFIXO_VERSAO%\Lays\VendaFutura"
 
 
-echo ==========================================================================
+echo ====================================================================================================
 echo VALIDAÇÃO DAS PASTAS DE ORIGEM
-echo ==========================================================================
+echo ====================================================================================================
 
 echo 🔍 Verificando se os diretórios de origem existem no G:\
 echo.
@@ -116,9 +114,9 @@ echo ☑️ Verificação concluída!
 echo.
 
 
-echo ========================================================================================================
+echo ====================================================================================================
 echo            INICIANDO CÓPIA DOS ARQUIVOS
-echo ========================================================================================================
+echo ====================================================================================================
 
 :: OPÇÕES DO ROBOCOPY:
 :: /NJH -> Oculta o cabeçalho
@@ -132,17 +130,16 @@ echo ===========================================================================
 :: /FFT -> Tolerância de 2 segundos na comparação de datas. Para casos em que são exibidos arquivos de rede mapeada com milissegundos de diferença.
 
 if "%ORIGEM1_OK%"=="1" (
-	echo ----------------------------------------------------------------------------------------------------
+	echo ----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 	echo 📁 Copiando arquivos
 	echo Origem: "%ORIGEM1%" 
 	echo Destino: "%DESTINO1%"
-	echo ----------------------------------------------------------------------------------------------------
 	robocopy "%ORIGEM1%" "%DESTINO1%" /E /ZB /R:1 /W:2 /NJH /NJS /NDL /XX /FFT /XD "DCP" "PLUGIN"
 	if errorlevel 8 goto ERRO
 )
 
 if "%ORIGEM2_OK%"=="1" (
-	echo ----------------------------------------------------------------------------------------------------
+	echo ----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 	echo 📁 Copiando arquivos
 	echo Origem: "%ORIGEM2%" 
 	echo Destino: "%DESTINO2%"
@@ -151,7 +148,7 @@ if "%ORIGEM2_OK%"=="1" (
 )
 
 if "%ORIGEM3_OK%"=="1" (
-	echo ----------------------------------------------------------------------------------------------------
+	echo ----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 	echo 📁 Copiando arquivos
 	echo Origem: "%ORIGEM3%" 
 	echo Destino: "%DESTINO3%"
@@ -160,7 +157,7 @@ if "%ORIGEM3_OK%"=="1" (
 )
 
 if "%ORIGEM4_OK%"=="1" (
-	echo ----------------------------------------------------------------------------------------------------
+	echo ----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 	echo 📁 Copiando arquivos
 	echo Origem: "%ORIGEM4%" 
 	echo Destino: "%DESTINO4%"
@@ -169,7 +166,7 @@ if "%ORIGEM4_OK%"=="1" (
 )
 
 if "%ORIGEM5_OK%"=="1" (
-	echo ----------------------------------------------------------------------------------------------------
+	echo ----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 	echo 📁 Copiando arquivos
 	echo Origem: "%ORIGEM5%" 
 	echo Destino: "%DESTINO5%"
@@ -178,7 +175,7 @@ if "%ORIGEM5_OK%"=="1" (
 )
 
 if "%ORIGEM6_OK%"=="1" (
-	echo ----------------------------------------------------------------------------------------------------
+	echo ----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 	echo 📁 Copiando arquivos
 	echo Origem: "%ORIGEM6%" 
 	echo Destino: "%DESTINO6%"
@@ -187,7 +184,7 @@ if "%ORIGEM6_OK%"=="1" (
 )
 
 if "%ORIGEM7_OK%"=="1" (
-	echo ----------------------------------------------------------------------------------------------------
+	echo ----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 	echo 📁 Copiando arquivos
 	echo Origem: "%ORIGEM7%" 
 	echo Destino: "%DESTINO7%"
@@ -196,7 +193,7 @@ if "%ORIGEM7_OK%"=="1" (
 )
 
 if "%ORIGEM8_OK%"=="1" (
-	echo ----------------------------------------------------------------------------------------------------
+	echo ----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 	echo 📁 Copiando arquivos
 	echo Origem: "%ORIGEM8%" 
 	echo Destino: "%DESTINO8%"
@@ -205,7 +202,7 @@ if "%ORIGEM8_OK%"=="1" (
 )
 
 if "%ORIGEM9_OK%"=="1" (
-	echo ----------------------------------------------------------------------------------------------------
+	echo ----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 	echo 📁 Copiando arquivos
 	echo Origem: "%ORIGEM9%" 
 	echo Destino: "%DESTINO9%"
@@ -249,8 +246,8 @@ goto :eof
 
 :SUCESSO
 echo.
-echo ========================================================================================================
+echo ====================================================================================================
 echo 🎉 PROCESSO FINALIZADO!
-echo ========================================================================================================
+echo ====================================================================================================
 echo.
 pause >nul

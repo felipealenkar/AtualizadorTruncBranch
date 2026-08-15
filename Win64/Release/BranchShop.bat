@@ -18,20 +18,6 @@ if "%~1"=="" (
     exit /b 1
 )
 
-if "%~2"=="" (
-    color 0C
-    echo ====================================================================================================
-    echo ❌ ERRO: VERSAO DA BRANCH NAO FOI INFORMADA!
-    echo ====================================================================================================
-    echo.
-    echo Uso: BranchShop.bat "NomeBranch" "VersaoBranch"
-    echo.
-    pause >nul
-    exit /b 1
-)
-set "NOME_BRANCH=%~1"
-set "VERSAO_BRANCH=%~2"
-
 :: -------------------------------------------------------------------------
 :: VERIFICAÇÃO RIGOROSA DE ADMINISTRADOR
 :: -------------------------------------------------------------------------
@@ -52,60 +38,72 @@ if %errorlevel% neq 0 (
     exit /b
 )
 
-echo ========================================================================================================
+set "NOME_BRANCH=%~1"
+set "VERSAO_BRANCH=%~2"
+
+if "%VERSAO_BRANCH%"=="" (
+    set "SUFIXO_VERSAO="
+	set "MSG_VERSAO=DIRETÓRIOS ORIGINAIS"
+) else (
+    set "SUFIXO_VERSAO= %VERSAO_BRANCH%"
+	set "MSG_VERSAO=DIRETÓRIOS PERSONALIZADOS COM O SUFIXO %VERSAO_BRANCH%"
+)
+
+echo ====================================================================================================
 echo            INICIANDO ATUALIZAÇÃO DA BRANCH SHOP: %NOME_BRANCH%
-echo ========================================================================================================
+echo            DESTINO: %MSG_VERSAO%
+echo ====================================================================================================
 echo.
 
 :: CONFIGURAÇÃO DOS CAMINHOS
 
 set "ORIGEM1=G:\ALTERDAT\Versoes\wshop\Hudson\branches\%NOME_BRANCH%\ACE"
-set "DESTINO1=C:\Program Files (x86)\Alterdata\Shop %VERSAO_BRANCH%"
+set "DESTINO1=C:\Program Files (x86)\Alterdata\Shop%SUFIXO_VERSAO%"
 
 set "ORIGEM2=G:\ALTERDAT\Versoes\wshop\Hudson\branches\%NOME_BRANCH%\BPL\Alexandria\Nota_Facil\PDV"
-set "DESTINO2=C:\Program Files (x86)\Alterdata\Biblioteca %VERSAO_BRANCH%"
+set "DESTINO2=C:\Program Files (x86)\Alterdata\Biblioteca%SUFIXO_VERSAO%"
 
 set "ORIGEM3=G:\ALTERDAT\Versoes\wshop\Hudson\branches\%NOME_BRANCH%\BPL\Tokyo\Alterdata"
-set "DESTINO3=C:\Program Files (x86)\Alterdata\Biblioteca %VERSAO_BRANCH%"
+set "DESTINO3=C:\Program Files (x86)\Alterdata\Biblioteca%SUFIXO_VERSAO%"
 
 set "ORIGEM4=G:\ALTERDAT\Versoes\wshop\Hudson\branches\%NOME_BRANCH%\BPL\Tokyo\Shop"
-set "DESTINO4=C:\Program Files (x86)\Alterdata\Biblioteca %VERSAO_BRANCH%"
+set "DESTINO4=C:\Program Files (x86)\Alterdata\Biblioteca%SUFIXO_VERSAO%"
 
 set "ORIGEM5=G:\ALTERDAT\Versoes\wshop\Hudson\branches\%NOME_BRANCH%\Java"
-set "DESTINO5=C:\Alterdata\ServicosWebShop\Integrador4Middleware %VERSAO_BRANCH%\Muven"
+set "DESTINO5=C:\Alterdata\ServicosWebShop%SUFIXO_VERSAO%\Integrador_4Middleware\Muven"
 
 set "ORIGEM6=G:\ALTERDAT\Versoes\wshop\Hudson\branches\%NOME_BRANCH%\PdvAlterdata\DLL\Alexandria\Nota_Facil"
-set "DESTINO6=C:\Program Files (x86)\Alterdata\Biblioteca %VERSAO_BRANCH%"
+set "DESTINO6=C:\Program Files (x86)\Alterdata\Biblioteca%SUFIXO_VERSAO%"
 
 set "ORIGEM7=G:\ALTERDAT\Versoes\wshop\Hudson\branches\%NOME_BRANCH%\PdvAlterdata\Exe\Alexandria\Nota_Facil"
-set "DESTINO7=C:\Program Files (x86)\Alterdata\Shop %VERSAO_BRANCH%"
+set "DESTINO7=C:\Program Files (x86)\Alterdata\Shop%SUFIXO_VERSAO%"
 
 set "ORIGEM8=G:\ALTERDAT\Versoes\wshop\Hudson\branches\%NOME_BRANCH%\PdvAlterdata\Lays\Alexandria\Nota_Facil"
-set "DESTINO8=C:\Program Files (x86)\Alterdata\Shop %VERSAO_BRANCH%\Lays"
+set "DESTINO8=C:\Program Files (x86)\Alterdata\Shop%SUFIXO_VERSAO%\Lays"
 
 set "ORIGEM9=G:\ALTERDAT\Versoes\wshop\Hudson\branches\%NOME_BRANCH%\PdvAlterdata\Lays\Alexandria\Spice\Rtm_NFCe"
-set "DESTINO9=C:\Program Files (x86)\Alterdata\Shop %VERSAO_BRANCH%\Lays\DanfeNFCe"
+set "DESTINO9=C:\Program Files (x86)\Alterdata\Shop%SUFIXO_VERSAO%\Lays\DanfeNFCe"
 
 set "ORIGEM10=G:\ALTERDAT\Versoes\wshop\Hudson\branches\%NOME_BRANCH%\Shop\Dll"
-set "DESTINO10=C:\Program Files (x86)\Alterdata\Biblioteca %VERSAO_BRANCH%"
+set "DESTINO10=C:\Program Files (x86)\Alterdata\Biblioteca%SUFIXO_VERSAO%"
 
 set "ORIGEM11=G:\ALTERDAT\Versoes\wshop\Hudson\branches\%NOME_BRANCH%\Shop\Especificos"
-set "DESTINO11=C:\Program Files (x86)\Alterdata\Shop %VERSAO_BRANCH%"
+set "DESTINO11=C:\Program Files (x86)\Alterdata\Shop%SUFIXO_VERSAO%"
 
 set "ORIGEM12=G:\ALTERDAT\Versoes\wshop\Hudson\branches\%NOME_BRANCH%\Shop\Ferramentas"
-set "DESTINO12=C:\Program Files (x86)\Alterdata\Modulos %VERSAO_BRANCH%"
+set "DESTINO12=C:\Program Files (x86)\Alterdata\Modulos%SUFIXO_VERSAO%"
 
 set "ORIGEM13=G:\ALTERDAT\Versoes\wshop\Hudson\branches\%NOME_BRANCH%\Shop\Ferramentas"
 set "DESTINO13=C:\Windows\SysWOW64"
 
 set "ORIGEM14=G:\ALTERDAT\Versoes\wshop\Hudson\branches\%NOME_BRANCH%\Shop\Geral"
-set "DESTINO14=C:\Program Files (x86)\Alterdata\Shop %VERSAO_BRANCH%"
+set "DESTINO14=C:\Program Files (x86)\Alterdata\Shop%SUFIXO_VERSAO%"
 
 set "ORIGEM15=G:\ALTERDAT\Versoes\wshop\Hudson\branches\%NOME_BRANCH%\Shop\Shop"
-set "DESTINO15=C:\Program Files (x86)\Alterdata\Shop %VERSAO_BRANCH%"
+set "DESTINO15=C:\Program Files (x86)\Alterdata\Shop%SUFIXO_VERSAO%"
 
 set "ORIGEM16=G:\ALTERDAT\Versoes\wshop\Hudson\branches\%NOME_BRANCH%\Shop\Suporte"
-set "DESTINO16=C:\Program Files (x86)\Alterdata\Shop %VERSAO_BRANCH%"
+set "DESTINO16=C:\Program Files (x86)\Alterdata\Shop%SUFIXO_VERSAO%"
 
 
 :: -------------------------------------------------------------------------
@@ -140,9 +138,9 @@ echo ☑️ Verificação concluída!
 echo.
 
 
-echo ========================================================================================================
+echo ====================================================================================================
 echo            INICIANDO CÓPIA DOS ARQUIVOS
-echo ========================================================================================================
+echo ====================================================================================================
 
 :: OPÇÕES DO ROBOCOPY:
 :: /NJH -> Oculta o cabeçalho
@@ -156,7 +154,7 @@ echo ===========================================================================
 :: /FFT -> Tolerância de 2 segundos na comparação de datas. Para casos em que são exibidos arquivos de rede mapeada com milissegundos de diferença.
 
 if "%ORIGEM1_OK%"=="1" (
-	echo ----------------------------------------------------------------------------------------------------
+	echo ----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 	echo 📁 Copiando arquivos
 	echo Origem: "%ORIGEM1%" 
 	echo Destino: "%DESTINO1%"
@@ -165,7 +163,7 @@ if "%ORIGEM1_OK%"=="1" (
 )
 
 if "%ORIGEM2_OK%"=="1" (
-	echo ----------------------------------------------------------------------------------------------------
+	echo ----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 	echo 📁 Copiando arquivos
 	echo Origem: "%ORIGEM2%" 
 	echo Destino: "%DESTINO2%"
@@ -174,7 +172,7 @@ if "%ORIGEM2_OK%"=="1" (
 )
 
 if "%ORIGEM3_OK%"=="1" (
-	echo ----------------------------------------------------------------------------------------------------
+	echo ----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 	echo 📁 Copiando arquivos
 	echo Origem: "%ORIGEM3%" 
 	echo Destino: "%DESTINO3%"
@@ -183,7 +181,7 @@ if "%ORIGEM3_OK%"=="1" (
 )
 
 if "%ORIGEM4_OK%"=="1" (
-	echo ----------------------------------------------------------------------------------------------------
+	echo ----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 	echo 📁 Copiando arquivos
 	echo Origem: "%ORIGEM4%" 
 	echo Destino: "%DESTINO4%"
@@ -192,7 +190,7 @@ if "%ORIGEM4_OK%"=="1" (
 )
 
 if "%ORIGEM5_OK%"=="1" (
-	echo ----------------------------------------------------------------------------------------------------
+	echo ----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 	echo 📁 Copiando arquivos
 	echo Origem: "%ORIGEM5%" 
 	echo Destino: "%DESTINO5%"
@@ -201,7 +199,7 @@ if "%ORIGEM5_OK%"=="1" (
 )
 
 if "%ORIGEM6_OK%"=="1" (
-	echo ----------------------------------------------------------------------------------------------------
+	echo ----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 	echo 📁 Copiando arquivos
 	echo Origem: "%ORIGEM6%" 
 	echo Destino: "%DESTINO6%"
@@ -210,7 +208,7 @@ if "%ORIGEM6_OK%"=="1" (
 )
 
 if "%ORIGEM7_OK%"=="1" (
-	echo ----------------------------------------------------------------------------------------------------
+	echo ----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 	echo 📁 Copiando arquivos
 	echo Origem: "%ORIGEM7%" 
 	echo Destino: "%DESTINO7%"
@@ -219,7 +217,7 @@ if "%ORIGEM7_OK%"=="1" (
 )
 
 if "%ORIGEM8_OK%"=="1" (
-	echo ----------------------------------------------------------------------------------------------------
+	echo ----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 	echo 📁 Copiando arquivos
 	echo Origem: "%ORIGEM8%" 
 	echo Destino: "%DESTINO8%"
@@ -228,7 +226,7 @@ if "%ORIGEM8_OK%"=="1" (
 )
 
 if "%ORIGEM9_OK%"=="1" (
-	echo ----------------------------------------------------------------------------------------------------
+	echo ----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 	echo 📁 Copiando arquivos
 	echo Origem: "%ORIGEM9%" 
 	echo Destino: "%DESTINO9%"
@@ -237,25 +235,25 @@ if "%ORIGEM9_OK%"=="1" (
 )
 
 if "%ORIGEM10_OK%"=="1" (
-	echo ----------------------------------------------------------------------------------------------------
+	echo ----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 	echo 📁 Copiando arquivos
 	echo Origem: "%ORIGEM10%" 
-	echo Destino: "%DESTINO10%".
+	echo Destino: "%DESTINO10%"
 	robocopy "%ORIGEM10%" "%DESTINO10%" /E /ZB /R:1 /W:2 /NJH /NJS /NDL /XX /FFT
 	if errorlevel 8 goto ERRO
 )
 
 if "%ORIGEM11_OK%"=="1" (
-	echo ----------------------------------------------------------------------------------------------------
+	echo ----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 	echo 📁 Copiando arquivos
 	echo Origem: "%ORIGEM11%" 
-	echo Destino: "%DESTINO11%".
+	echo Destino: "%DESTINO11%"
 	robocopy "%ORIGEM11%" "%DESTINO11%" /E /ZB /R:1 /W:2 /NJH /NJS /NDL /XX /FFT
 	if errorlevel 8 goto ERRO
 )
 
 if "%ORIGEM12_OK%"=="1" (
-	echo ----------------------------------------------------------------------------------------------------
+	echo ----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 	echo 📁 Copiando arquivos
 	echo Origem: "%ORIGEM12%" 
 	echo Destino: "%DESTINO12%"
@@ -264,7 +262,7 @@ if "%ORIGEM12_OK%"=="1" (
 )
 
 if "%ORIGEM13_OK%"=="1" (
-	echo ----------------------------------------------------------------------------------------------------
+	echo ----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 	echo 📁 Copiando arquivos
 	echo Origem: "%ORIGEM13%" 
 	echo Destino: "%DESTINO13%"
@@ -273,7 +271,7 @@ if "%ORIGEM13_OK%"=="1" (
 )
 
 if "%ORIGEM14_OK%"=="1" (
-	echo ----------------------------------------------------------------------------------------------------
+	echo ----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 	echo 📁 Copiando arquivos
 	echo Origem: "%ORIGEM14%" 
 	echo Destino: "%DESTINO14%"
@@ -282,7 +280,7 @@ if "%ORIGEM14_OK%"=="1" (
 )
 
 if "%ORIGEM15_OK%"=="1" (
-	echo ----------------------------------------------------------------------------------------------------
+	echo ----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 	echo 📁 Copiando arquivos
 	echo Origem: "%ORIGEM15%" 
 	echo Destino: "%DESTINO15%"
@@ -291,7 +289,7 @@ if "%ORIGEM15_OK%"=="1" (
 )
 
 if "%ORIGEM16_OK%"=="1" (
-	echo ----------------------------------------------------------------------------------------------------
+	echo ----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 	echo 📁 Copiando arquivos
 	echo Origem: "%ORIGEM16%" 
 	echo Destino: "%DESTINO16%"
@@ -326,8 +324,8 @@ goto :eof
 
 :SUCESSO
 echo.
-echo ========================================================================================================
+echo ====================================================================================================
 echo 🎉 PROCESSO FINALIZADO!
-echo ========================================================================================================
+echo ====================================================================================================
 echo.
 pause >nul

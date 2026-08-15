@@ -1,11 +1,11 @@
-object FrmPrincipal: TFrmPrincipal
+﻿object FrmPrincipal: TFrmPrincipal
   Left = 0
   Top = 0
   Anchors = [akLeft, akTop, akRight]
   BorderIcons = [biSystemMenu, biMinimize]
   BorderStyle = bsSingle
   Caption = 'Atualizador Trunk/Branch'
-  ClientHeight = 615
+  ClientHeight = 717
   ClientWidth = 1454
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -8470,35 +8470,36 @@ object FrmPrincipal: TFrmPrincipal
   object PnlFiltros: TPanel
     Left = 0
     Top = 0
-    Width = 342
-    Height = 615
+    Width = 353
+    Height = 717
     Align = alLeft
     TabOrder = 0
     DesignSize = (
-      342
-      615)
+      353
+      717)
     object LblSistema: TLabel
       Left = 7
       Top = 9
-      Width = 14
+      Width = 52
       Height = 15
       Anchors = [akLeft, akTop, akRight]
       Caption = 'Sistema'
-      ExplicitWidth = 72
+      ExplicitWidth = 41
     end
     object CbbSistema: TComboBox
       Left = 6
       Top = 30
-      Width = 330
+      Width = 341
       Height = 23
       Style = csDropDownList
       Anchors = [akLeft, akTop, akRight]
       TabOrder = 0
       OnChange = CbbSistemaChange
+      ExplicitWidth = 330
     end
     object BtnAtualizar: TButton
-      Left = 103
-      Top = 520
+      Left = 107
+      Top = 620
       Width = 135
       Height = 81
       Anchors = [akLeft, akBottom]
@@ -8513,7 +8514,7 @@ object FrmPrincipal: TFrmPrincipal
     object RgCompilacao: TRadioGroup
       Left = 6
       Top = 73
-      Width = 330
+      Width = 341
       Height = 81
       Anchors = [akLeft, akTop, akRight]
       Caption = 'Compila'#231#227'o'
@@ -8523,16 +8524,17 @@ object FrmPrincipal: TFrmPrincipal
         'Branch')
       TabOrder = 2
       OnClick = RgCompilacaoClick
+      ExplicitWidth = 330
     end
     object GrpVersoes: TGroupBox
       Left = 6
-      Top = 176
-      Width = 330
+      Top = 276
+      Width = 341
       Height = 329
       Caption = 'Vers'#245'es'
       TabOrder = 3
       DesignSize = (
-        330
+        341
         329)
       object BtnAdicionarVersao: TButton
         Left = 6
@@ -8585,32 +8587,46 @@ object FrmPrincipal: TFrmPrincipal
       object LbxVersoes: TListBox
         Left = 47
         Top = 24
-        Width = 237
+        Width = 248
         Height = 289
         Anchors = [akLeft, akTop, akRight, akBottom]
         Enabled = False
         ItemHeight = 15
         Sorted = True
         TabOrder = 3
-        ExplicitWidth = 277
+        ExplicitWidth = 237
       end
+    end
+    object RgDiretório: TRadioGroup
+      Left = 6
+      Top = 174
+      Width = 341
+      Height = 81
+      Anchors = [akLeft, akTop, akRight]
+      Caption = 'Copiar arquivos para os diret'#243'rios'
+      Items.Strings = (
+        'Originais (Shop, Biblioteca, PDV Alterdata. etc...)'
+        'Personalizados (Shop X.XXXX.X, biblioteca X.XXXX.X, etc...)')
+      TabOrder = 4
+      OnClick = RgDiretórioClick
+      ExplicitWidth = 330
     end
   end
   object PnlLog: TPanel
-    Left = 342
+    Left = 353
     Top = 0
-    Width = 1112
-    Height = 615
+    Width = 1101
+    Height = 717
     Align = alClient
     TabOrder = 1
-    ExplicitLeft = 369
-    ExplicitWidth = 973
+    ExplicitLeft = 342
+    ExplicitWidth = 1112
     object mmoMemoLog: TMemo
       AlignWithMargins = True
       Left = 14
       Top = 14
-      Width = 1084
-      Height = 587
+      Width = 1073
+      Height = 689
       Margins.Left = 13
       Margins.Top = 13
       Margins.Right = 13
@@ -8619,7 +8635,8 @@ object FrmPrincipal: TFrmPrincipal
       ReadOnly = True
       ScrollBars = ssVertical
       TabOrder = 0
-      ExplicitWidth = 945
+      ExplicitWidth = 1084
+      ExplicitHeight = 587
     end
   end
   object VImgLImagens: TVirtualImageList

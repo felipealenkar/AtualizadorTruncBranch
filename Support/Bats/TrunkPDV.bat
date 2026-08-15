@@ -17,7 +17,6 @@ if "%~1"=="" (
     pause >nul
     exit /b 1
 )
-set "NOME_LIB=%~1"
 
 :: -------------------------------------------------------------------------
 :: VERIFICAÇÃO RIGOROSA DE ADMINISTRADOR
@@ -39,57 +38,69 @@ if %errorlevel% neq 0 (
     exit /b
 )
 
-echo ========================================================================================================
+set "NOME_LIB=%~1"
+set "VERSAO_BRANCH=%~2"
+
+if "%VERSAO_BRANCH%"=="" (
+    set "SUFIXO_VERSAO="
+	set "MSG_VERSAO=DIRETÓRIOS ORIGINAIS"
+) else (
+    set "SUFIXO_VERSAO= Trunk"
+	set "MSG_VERSAO=DIRETÓRIOS PERSONALIZADOS COM O SUFIXO Trunk"
+)
+
+echo ====================================================================================================
 echo             INICIANDO ATUALIZAÇÃO DA TRUNK PDV
-echo ========================================================================================================
+echo             DESTINO: %MSG_VERSAO%
+echo ====================================================================================================
 echo.
 
 :: CONFIGURAÇÃO DOS CAMINHOS
 
 set "ORIGEM1=G:\ALTERDAT\Versoes\wshop\Hudson\trunk\ACE"
-set "DESTINO1=C:\Program Files (x86)\Alterdata\Concentrador"
+set "DESTINO1=C:\Program Files (x86)\Alterdata\Concentrador%SUFIXO_VERSAO%"
 
 set "ORIGEM2=G:\ALTERDAT\Versoes\wshop\Hudson\trunk\ACE"
-set "DESTINO2=C:\Program Files (x86)\Alterdata\PDV Alterdata"
+set "DESTINO2=C:\Program Files (x86)\Alterdata\PDV Alterdata%SUFIXO_VERSAO%"
 
 set "ORIGEM3=G:\ALTERDAT\Versoes\wshop\Hudson\trunk\BPL\Alexandria\PDV"
-set "DESTINO3=C:\Program Files (x86)\Alterdata\Biblioteca"
+set "DESTINO3=C:\Program Files (x86)\Alterdata\Biblioteca%SUFIXO_VERSAO%"
 
 set "ORIGEM4=G:\ALTERDAT\Versoes\wshop\Hudson\trunk\BPL\Alexandria\PDV\PLUGIN"
-set "DESTINO4=C:\Program Files (x86)\Alterdata\PDV Alterdata\MODPDV"
+set "DESTINO4=C:\Program Files (x86)\Alterdata\PDV Alterdata%SUFIXO_VERSAO%\MODPDV"
 
 set "ORIGEM5=G:\ALTERDAT\Versoes\wshop\Hudson\trunk\PdvAlterdata\DLL"
-set "DESTINO5=C:\Program Files (x86)\Alterdata\Biblioteca"
+set "DESTINO5=C:\Program Files (x86)\Alterdata\Biblioteca%SUFIXO_VERSAO%"
 
 set "ORIGEM6=G:\ALTERDAT\Versoes\wshop\Hudson\trunk\PdvAlterdata\DLL\tokyo"
-set "DESTINO6=C:\Program Files (x86)\Alterdata\Biblioteca"
+set "DESTINO6=C:\Program Files (x86)\Alterdata\Biblioteca%SUFIXO_VERSAO%"
 
 set "ORIGEM7=G:\ALTERDAT\Versoes\wshop\Hudson\trunk\PdvAlterdata\DLL\Alexandria"
-set "DESTINO7=C:\Program Files (x86)\Alterdata\Biblioteca"
+set "DESTINO7=C:\Program Files (x86)\Alterdata\Biblioteca%SUFIXO_VERSAO%"
 
 set "ORIGEM8=G:\ALTERDAT\Versoes\wshop\Hudson\trunk\PdvAlterdata\Especificos\Exe"
-set "DESTINO8=C:\Program Files (x86)\Alterdata\PDV Alterdata"
+set "DESTINO8=C:\Program Files (x86)\Alterdata\PDV Alterdata%SUFIXO_VERSAO%"
 
 set "ORIGEM9=G:\ALTERDAT\Versoes\wshop\Hudson\trunk\PdvAlterdata\Exe\Alexandria"
-set "DESTINO9=C:\Program Files (x86)\Alterdata\Concentrador"
+set "DESTINO9=C:\Program Files (x86)\Alterdata\Concentrador%SUFIXO_VERSAO%"
 
 set "ORIGEM10=G:\ALTERDAT\Versoes\wshop\Hudson\trunk\PdvAlterdata\Exe\Alexandria"
-set "DESTINO10=C:\Program Files (x86)\Alterdata\Concentrador\Exe\IntegradorPDV"
+set "DESTINO10=C:\Program Files (x86)\Alterdata\Concentrador%SUFIXO_VERSAO%\Exe\IntegradorPDV"
 
 set "ORIGEM11=G:\ALTERDAT\Versoes\wshop\Hudson\trunk\PdvAlterdata\Exe\Alexandria"
-set "DESTINO11=C:\Program Files (x86)\Alterdata\PDV Alterdata"
+set "DESTINO11=C:\Program Files (x86)\Alterdata\PDV Alterdata%SUFIXO_VERSAO%"
 
 set "ORIGEM12=G:\ALTERDAT\Versoes\wshop\Hudson\trunk\PdvAlterdata\Exe\Alexandria"
-set "DESTINO12=C:\Program Files (x86)\Alterdata\PreVenda"
+set "DESTINO12=C:\Program Files (x86)\Alterdata\PreVenda%SUFIXO_VERSAO%"
 
 set "ORIGEM13=G:\ALTERDAT\Versoes\wshop\Hudson\trunk\PdvAlterdata\Lays\Alexandria"
-set "DESTINO13=C:\Program Files (x86)\Alterdata\PDV Alterdata\Lays"
+set "DESTINO13=C:\Program Files (x86)\Alterdata\PDV Alterdata%SUFIXO_VERSAO%\Lays"
 
 set "ORIGEM14=G:\ALTERDAT\Versoes\wshop\Hudson\trunk\PdvAlterdata\Lays\Alexandria\Rtm_NFCe"
-set "DESTINO14=C:\Program Files (x86)\Alterdata\PDV Alterdata\Lays\DanfeNFCe"
+set "DESTINO14=C:\Program Files (x86)\Alterdata\PDV Alterdata%SUFIXO_VERSAO%\Lays\DanfeNFCe"
 
 set "ORIGEM15=G:\ALTERDAT\Versoes\wshop\Hudson\trunk\PdvAlterdata\Lays\Alexandria\Rtm_Venda_Futura"
-set "DESTINO15=C:\Program Files (x86)\Alterdata\PDV Alterdata\Lays\VendaFutura"
+set "DESTINO15=C:\Program Files (x86)\Alterdata\PDV Alterdata%SUFIXO_VERSAO%\Lays\VendaFutura"
 
 :: -------------------------------------------------------------------------
 :: CAMINHOS CONDICIONAIS - (dependem do parâmetro da branch)
@@ -97,23 +108,23 @@ set "DESTINO15=C:\Program Files (x86)\Alterdata\PDV Alterdata\Lays\VendaFutura"
 
 if /I "%NOME_LIB%"=="Trunk" (
     set "ORIGEM_OP1=G:\ALTERDAT\Versoes\wshop\Hudson\trunk\BPL\Tokyo\Alterdata"
-    set "DESTINO_OP1=C:\Program Files (x86)\Alterdata\Biblioteca"
+    set "DESTINO_OP1=C:\Program Files (x86)\Alterdata\Biblioteca%SUFIXO_VERSAO%"
 
     set "ORIGEM_OP2=G:\ALTERDAT\Versoes\wshop\Hudson\trunk\BPL\Tokyo\SHOP"
-    set "DESTINO_OP2=C:\Program Files (x86)\Alterdata\Biblioteca"
+    set "DESTINO_OP2=C:\Program Files (x86)\Alterdata\Biblioteca%SUFIXO_VERSAO%"
 ) else (
     set "ORIGEM_OP1=G:\ALTERDAT\Versoes\wshop\Hudson\branches\%NOME_LIB%\BPL\Tokyo\Alterdata"
     set "ORIGEM_OP1_FULL=G:\ALTERDAT\Versoes\wshop\Hudson\branches\%NOME_LIB%_FULL\BPL\Tokyo\Alterdata"
-    set "DESTINO_OP1=C:\Program Files (x86)\Alterdata\Biblioteca"
+    set "DESTINO_OP1=C:\Program Files (x86)\Alterdata\Biblioteca%SUFIXO_VERSAO%"
 
 	set "ORIGEM_OP2=G:\ALTERDAT\Versoes\wshop\Hudson\branches\%NOME_LIB%\BPL\Tokyo\Shop"
     set "ORIGEM_OP2_FULL=G:\ALTERDAT\Versoes\wshop\Hudson\branches\%NOME_LIB%_FULL\BPL\Tokyo\Shop"
-    set "DESTINO_OP2=C:\Program Files (x86)\Alterdata\Biblioteca"
+    set "DESTINO_OP2=C:\Program Files (x86)\Alterdata\Biblioteca%SUFIXO_VERSAO%"
 )
 
-echo ==========================================================================
+echo ====================================================================================================
 echo VALIDAÇÃO DAS PASTAS DE ORIGEM
-echo ==========================================================================
+echo ====================================================================================================
 
 echo 🔍 Verificando se os diretórios de origem existem no G:\
 echo.
@@ -144,6 +155,7 @@ if defined ORIGEM_OP2_FULL call :VERIFICAR_PASTA_OPCIONAL "%ORIGEM_OP2_FULL%" "O
 
 :: Se houve algum erro em qualquer pasta, para o script aqui
 if "%ERRO_PASTA%"=="1" (
+    echo.
     echo ====================================================================================================
     echo ❌ A ATUALIZAÇÃO FOI INTERROMPIDA!
     echo Verifique se os arquivos estão em outra unidade de disco
@@ -158,9 +170,9 @@ echo ☑️ Verificação concluída!
 echo.
 
 
-echo ========================================================================================================
+echo ====================================================================================================
 echo            INICIANDO CÓPIA DOS ARQUIVOS
-echo ========================================================================================================
+echo ====================================================================================================
 
 :: OPÇÕES DO ROBOCOPY:
 :: /NJH -> Oculta o cabeçalho
@@ -173,118 +185,118 @@ echo ===========================================================================
 :: /XX  -> (Exclude Extra): Impede que o Robocopy liste os arquivos que só existem no destino.
 :: /FFT -> Tolerância de 2 segundos na comparação de datas. Para casos em que são exibidos arquivos de rede mapeada com milissegundos de diferença.
 
-echo ----------------------------------------------------------------------------------------------------
+echo ----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 echo 📁 Copiando arquivos
 echo Origem: "%ORIGEM1%" 
 echo Destino: "%DESTINO1%"
 robocopy "%ORIGEM1%" "%DESTINO1%" "ISHOP_Ribbon.ACE" "WSHOP_Ribbon.ACE" /ZB /R:1 /W:2 /NJH /NJS /NDL /XX /FFT
 if errorlevel 8 goto ERRO
 
-echo ----------------------------------------------------------------------------------------------------
+echo ----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 echo 📁 Copiando arquivos
 echo Origem: "%ORIGEM2%" 
 echo Destino: "%DESTINO2%"
 robocopy "%ORIGEM2%" "%DESTINO2%" "ISHOP_Ribbon.ACE" "WSHOP_Ribbon.ACE" /ZB /R:1 /W:2 /NJH /NJS /NDL /XX /FFT
 if errorlevel 8 goto ERRO
 
-echo ----------------------------------------------------------------------------------------------------
+echo ----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 echo 📁 Copiando arquivos
 echo Origem: "%ORIGEM3%" 
 echo Destino: "%DESTINO3%"
 robocopy "%ORIGEM3%" "%DESTINO3%" /E /ZB /R:1 /W:2 /NJH /NJS /NDL /XX /FFT /XD "DCP" "PLUGIN" 
 if errorlevel 8 goto ERRO
 
-echo ----------------------------------------------------------------------------------------------------
+echo ----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 echo 📁 Copiando arquivos
 echo Origem: "%ORIGEM4%" 
 echo Destino: "%DESTINO4%"
 robocopy "%ORIGEM4%" "%DESTINO4%" /E /ZB /R:1 /W:2 /NJH /NJS /NDL /XX /FFT /XD "ERP" 
 if errorlevel 8 goto ERRO
 
-echo ----------------------------------------------------------------------------------------------------
+echo ----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 echo 📁 Copiando arquivos
 echo Origem: "%ORIGEM5%" 
 echo Destino: "%DESTINO5%"
 robocopy "%ORIGEM5%" "%DESTINO5%" /E /ZB /R:1 /W:2 /NJH /NJS /NDL /XX /FFT /XF "AltMarketCliente_900.dll" "AltMarketProduto_900.dll" "AltMarketValidacaoBase_900.dll" "ImpressaoOrcOffline_900.dll" /XD "tokyo" "Alexandria"
 if errorlevel 8 goto ERRO
 
-echo ----------------------------------------------------------------------------------------------------
+echo ----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 echo 📁 Copiando arquivos
 echo Origem: "%ORIGEM6%" 
 echo Destino: "%DESTINO6%"
 robocopy "%ORIGEM6%" "%DESTINO6%" /E /ZB /R:1 /NJH /NJS /NDL /XX /FFT /W:2 /XF "AltLibTefCertificadas_900.dll" "AltMarketProduto_900.dll"
 if errorlevel 8 goto ERRO
 
-echo ----------------------------------------------------------------------------------------------------
+echo ----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 echo 📁 Copiando arquivos
 echo Origem: "%ORIGEM7%" 
 echo Destino: "%DESTINO7%"
 robocopy "%ORIGEM7%" "%DESTINO7%" /E /ZB /R:1 /W:2 /NJH /NJS /NDL /XX /FFT /XD "Nota_Facil"
 if errorlevel 8 goto ERRO
 
-echo ----------------------------------------------------------------------------------------------------
+echo ----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 echo 📁 Copiando arquivos
 echo Origem: "%ORIGEM8%" 
 echo Destino: "%DESTINO8%"
 robocopy "%ORIGEM8%" "%DESTINO8%" /E /ZB /R:1 /W:2 /NJH /NJS /NDL /FFT /XX /XF "AltShop_GeradorDeArquivos.exe" "AltShop_ImpressaoEtiquetasOffLine.exe" "AltShopProc_AbreDat.exe" "assinatura.txt"
 if errorlevel 8 goto ERRO
 
-echo ----------------------------------------------------------------------------------------------------
+echo ----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 echo 📁 Copiando arquivos
 echo Origem: "%ORIGEM9%" 
 echo Destino: "%DESTINO9%"
 robocopy "%ORIGEM9%" "%DESTINO9%" /E /ZB /R:1 /W:2 /NJH /NJS /NDL /XX /FFT /XF "*.AR1" "*.AR2" "AltShop_AgenteTerminalPreVenda.exe" "AltShop_GeradorCargaBalancaPDV.exe" "AltShop_GeradorDeArquivos.exe" "AltShop_GerenciadorNotas.exe" "AltShop_ImpressaoEtiquetasOffLine.exe" "AltShop_InutilizacaoFaixaNFCe.exe" "AltShopConfCegaPDV.exe" "AltShopConfigSrvPDV.exe" "AltShopProc_AbreDat.exe" "AltShopServicePDV.exe" "CertDataControl.ach" "ConcentradorGuardian.exe" "ConverterDatEmJson.exe" "ImpressaoDanfeNFCe.exe" "IntegradorPreVendaPDV.exe" "LiberaECF.exe" "PDVAlterdata.exe" "PinPadFinder.exe" "RecuperadorSQLite.exe" "TotenMarket.exe" "WinCertCtrl.ach" /XD "Nota_Facil"
 if errorlevel 8 goto ERRO
 
-echo ----------------------------------------------------------------------------------------------------
+echo ----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 echo 📁 Copiando arquivos
 echo Origem: "%ORIGEM10%" 
 echo Destino: "%DESTINO10%"
 robocopy "%ORIGEM10%" "%DESTINO10%" /E /ZB /R:1 /W:2 /NJH /NJS /NDL /XX /FFT /XF "*.AR1" "*.AR2" "AltShop_AgenteTerminalPreVenda.exe" "AltShop_ConfigBasePadrao.exe" "Altshop_ConfigServidorOffLineCloud.exe" "AltShop_ConfiguradorSchemaPluginPDV.exe" "AltShop_GeradorDeArquivos.exe" "AltShop_GerenciadorNotas.exe" "AltShop_InutilizacaoFaixaNFCe.exe" "AltShop_ServidorOFFLineCloud.exe" "AltShopProc_AbreDat.exe" "CertDataControl.ach" "ConverterDatEmJson.exe" "ExpOffLine.exe" "ImpOffLine.exe" "ImpressaoDanfeNFCe.exe" "IntegradorPreVendaPDV.exe" "LiberaECF.exe" "PDVAlterdata.exe" "PinPadFinder.exe" "RecuperadorSQLite.exe" "ServidorOffLine.exe" "ServidorOffLineGuardian.exe" "ServidorOffLineSvc.exe" "TotenMarket.exe" "WinCertCtrl.ach" /XD "Nota_Facil"
 if errorlevel 8 goto ERRO
 
-echo ----------------------------------------------------------------------------------------------------
+echo ----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 echo 📁 Copiando arquivos
 echo Origem: "%ORIGEM11%" 
 echo Destino: "%DESTINO11%"
 robocopy "%ORIGEM11%" "%DESTINO11%" /E /ZB /R:1 /W:2 /NJH /NJS /NDL /XX /FFT /XF "*.AR1" "*.AR2" "AltShop_AgenteTerminalPreVenda.exe" "Altshop_ConfigServidorOffLineCloud.exe" "AltShop_ConfiguradorSchemaPluginPDV.exe" "AltShop_ImpressaoEtiquetasOffLine.exe" "AltShop_ServidorOFFLineCloud.exe" "AltShopConfigSrvPDV.exe" "AltShopServicePDV.exe" "CertDataControl.ach" "ConcentradorGuardian.exe" "IntegradorPreVendaPDV.exe" "ServidorOffLineSvc.exe" "WinCertCtrl.ach" /XD "Nota_Facil"
 if errorlevel 8 goto ERRO
 
-echo ----------------------------------------------------------------------------------------------------
+echo ----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 echo 📁 Copiando arquivos
 echo Origem: "%ORIGEM12%" 
 echo Destino: "%DESTINO12%"
 robocopy "%ORIGEM12%" "%DESTINO12%" /E /ZB /R:1 /W:2 /NJH /NJS /NDL /XX /FFT /XF "*.AR1" "*.AR2" "AltShop_ConfigBasePadrao.exe" "Altshop_ConfigServidorOffLineCloud.exe" "AltShop_ConfiguradorSchemaPluginPDV.exe" "AltShop_GeradorCargaBalancaPDV.exe" "AltShop_GeradorDeArquivos.exe" "AltShop_GerenciadorNotas.exe" "AltShop_ImpressaoEtiquetasOffLine.exe" "AltShop_InutilizacaoFaixaNFCe.exe" "AltShop_ServidorOFFLineCloud.exe" "AltShopConfCegaPDV.exe" "AltShopConfigSrvPDV.exe" "AltShopProc_AbreDat.exe" "AltShopServicePDV.exe" "CertDataControl.ach" "ConcentradorGuardian.exe" "ConverterDatEmJson.exe" "ExpOffLine.exe" "ImpOffLine.exe" "ImpressaoDanfeNFCe.exe" "LiberaECF.exe" "PDVAlterdata.exe" "PinPadFinder.exe" "RecuperadorSQLite.exe" "ServidorOffLine.exe" "ServidorOffLineGuardian.exe" "ServidorOffLineSvc.exe" "TotenMarket.exe" "WinCertCtrl.ach" /XD "Nota_Facil"
 if errorlevel 8 goto ERRO
 
-echo ----------------------------------------------------------------------------------------------------
+echo ----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 echo 📁 Copiando arquivos
 echo Origem: "%ORIGEM13%" 
 echo Destino: "%DESTINO13%"
 robocopy "%ORIGEM13%" "%DESTINO13%" /E /ZB /R:1 /W:2 /NJH /NJS /NDL /XX /FFT /XD "Nota_Facil" "Rtm_NFCe" "Rtm_Venda_Futura" "Spice"
 if errorlevel 8 goto ERRO
 
-echo ----------------------------------------------------------------------------------------------------
+echo ----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 echo 📁 Copiando arquivos
 echo Origem: "%ORIGEM14%" 
 echo Destino: "%DESTINO14%"
 robocopy "%ORIGEM14%" "%DESTINO14%" /E /ZB /R:1 /W:2 /NJH /NJS /NDL /XX /FFT
 if errorlevel 8 goto ERRO
 
-echo ----------------------------------------------------------------------------------------------------
+echo ----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 echo 📁 Copiando arquivos
 echo Origem: "%ORIGEM15%" 
 echo Destino: "%DESTINO15%"
 robocopy "%ORIGEM15%" "%DESTINO15%" /E /ZB /R:1 /W:2 /NJH /NJS /NDL /XX /FFT
 if errorlevel 8 goto ERRO
 
-echo ========================================================================================================
+echo ====================================================================================================
 echo            CÓPIA DOS ARQUIVOS DA LIB SHOP COMPATÍVEL
-echo ========================================================================================================
+echo ====================================================================================================
 
 if /I "%NOME_LIB%"=="Trunk" (
 	if "%ORIGEM_OP1_OK%"=="1" (
-		echo ----------------------------------------------------------------------------------------------------
+		echo ----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 		echo 📁 Copiando arquivos
 		echo Origem: "%ORIGEM_OP1%" 
 		echo Destino: "%DESTINO_OP1%"
@@ -293,7 +305,7 @@ if /I "%NOME_LIB%"=="Trunk" (
 	)
 
 	if "%ORIGEM_OP2_OK%"=="1" (
-		echo ----------------------------------------------------------------------------------------------------
+		echo ----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 		echo 📁 Copiando arquivos
 		echo Origem: "%ORIGEM_OP2%" 
 		echo Destino: "%DESTINO_OP2%"
@@ -348,7 +360,7 @@ set "P_DESTINO=%~3"
 set "XFLIST="
 
 if exist "%P_OP%" (
-    echo ----------------------------------------------------------------------------------------------------
+    echo ----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 	echo 📁 Copiando arquivos LibShop
     echo Origem: "%P_OP%"
     echo Destino: "%P_DESTINO%"
@@ -366,7 +378,7 @@ if exist "%P_OP%" (
 )
 
 if exist "%P_FULL%" (
-    echo ----------------------------------------------------------------------------------------------------
+    echo ----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 	echo 📁 Copiando arquivos LibShop Full
     echo Origem: "%P_FULL%"
     echo Destino: "%P_DESTINO%"
@@ -387,8 +399,8 @@ exit /b 0
 
 :SUCESSO
 echo.
-echo ========================================================================================================
+echo ====================================================================================================
 echo 🎉 PROCESSO FINALIZADO!
-echo ========================================================================================================
+echo ====================================================================================================
 echo.
 pause >nul

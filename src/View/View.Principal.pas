@@ -24,6 +24,7 @@ type
     BtnRemoverVersao: TButton;
     BtnLimparVersoes: TButton;
     LbxVersoes: TListBox;
+    RgDiretório: TRadioGroup;
     procedure BtnAtualizarClick(Sender: TObject);
     procedure RgCompilacaoClick(Sender: TObject);
     procedure FormShow(Sender: TObject);
@@ -31,17 +32,20 @@ type
     procedure BtnAdicionarVersaoClick(Sender: TObject);
     procedure BtnRemoverVersaoClick(Sender: TObject);
     procedure BtnLimparVersoesClick(Sender: TObject);
+    procedure RgDiretórioClick(Sender: TObject);
   private
     FSistemaEscolhido: string;
     FCompilacaoEscolhida: string;
     FNomeArquivoBat: string;
     FBuscaVersoes: string;
-
+    FGravarEmDiretoriosOriginais: Boolean;
 
     procedure AdicionarLog(const PLinha: string);
     procedure CarregarVersoesFavoritas(PTipoVersao: string);
+    function LerConfiguracoes(PSecao, PChave: string; PPadrao: Boolean = False): Boolean;
     procedure ExecutarBat(const PCaminhoBat: string; const PNomeBranch: string = ''; const PVersaoBranch: string = '');
     procedure GravarVersoesFavoritas(PTipoBranch: string);
+    procedure GravarConfiguracoes(PSecao, PChave: string; PValor: Boolean);
     procedure IniciarComponentesVisuais;
     procedure ModificarComponentes;
     procedure TravarUI(PTravado: Boolean);
@@ -94,6 +98,21 @@ begin
   IniciarComponentesVisuais;
 end;
 
+procedure TFrmPrincipal.GravarConfiguracoes(PSecao, PChave: string; PValor: Boolean);
+var
+  LArquivoIni: TIniFile;
+  LCaminhoIni: string;
+begin
+  LCaminhoIni := TPath.Combine(TPath.GetDirectoryName(ParamStr(0)), 'VersoesFavoritas.ini');
+  LArquivoIni := nil;
+  try
+    LArquivoIni := TIniFile.Create(LCaminhoIni);
+    LArquivoIni.WriteBool(PSecao, PChave, PValor);
+  finally
+    LArquivoIni.Free;
+  end;
+end;
+
 procedure TFrmPrincipal.GravarVersoesFavoritas(PTipoBranch: string);
 var
   LArquivoIni: TIniFile;
@@ -122,8 +141,29 @@ begin
   CbbSistema.ItemIndex := CbbSistema.Items.IndexOf(SISTEMA_ISHOP_WSHOP);
   FSistemaEscolhido := CbbSistema.Items.Strings[CbbSistema.ItemIndex];
   FCompilacaoEscolhida := RgCompilacao.Items.Strings[RgCompilacao.ItemIndex];
+  FGravarEmDiretoriosOriginais := LerConfiguracoes('CONFIGURACOES', 'GRAVAR_EM_DIRETORIOS_ORIGINAIS');
+
+  case FGravarEmDiretoriosOriginais of
+    True: RgDiretório.ItemIndex := 0;
+    False: RgDiretório.ItemIndex := 1;
+  end;
   ModificarComponentes;
   mmoMemoLog.Clear;
+end;
+
+function TFrmPrincipal.LerConfiguracoes(PSecao, PChave: string; PPadrao: Boolean): Boolean;
+var
+  LArquivoIni: TIniFile;
+  LCaminhoIni: string;
+begin
+  LCaminhoIni := TPath.Combine(TPath.GetDirectoryName(ParamStr(0)), 'VersoesFavoritas.ini');
+  LArquivoIni := nil;
+  try
+    LArquivoIni := TIniFile.Create(LCaminhoIni);
+    Result := LArquivoIni.ReadBool(PSecao, PChave, PPadrao);
+  finally
+    LArquivoIni.Free;
+  end;
 end;
 
 procedure TFrmPrincipal.ModificarComponentes;
@@ -206,6 +246,16 @@ begin
   ModificarComponentes;
 end;
 
+procedure TFrmPrincipal.RgDiretórioClick(Sender: TObject);
+begin
+  case RgDiretório.ItemIndex of
+    0: FGravarEmDiretoriosOriginais := True;
+    1: FGravarEmDiretoriosOriginais := False;
+  end;
+  GravarConfiguracoes('CONFIGURACOES', 'GRAVAR_EM_DIRETORIOS_ORIGINAIS', FGravarEmDiretoriosOriginais);
+  ModificarComponentes;
+end;
+
 function TFrmPrincipal.ValidarCamposPreenchidos: Boolean;
 var
   LLista: TStringList;
@@ -217,6 +267,8 @@ begin
       LLista.Add('- ' + LblSistema.Caption);
     if RgCompilacao.ItemIndex < 0 then
       LLista.Add('- ' + RgCompilacao.Caption);
+    if RgDiretório.ItemIndex < 0 then
+      LLista.Add('- ' + 'Destino dos arquivos');
     if ((RgCompilacao.ItemIndex = RgCompilacao.Items.IndexOf(COMPILACAO_TRUNK)) and
        (FSistemaEscolhido = SISTEMA_PDV_Alterdata)) or (RgCompilacao.ItemIndex = RgCompilacao.Items.IndexOf(COMPILACAO_BRANCH)) then
     begin
@@ -239,15 +291,26 @@ procedure TFrmPrincipal.TravarUI(PTravado: Boolean);
 begin
   CbbSistema.Enabled := not PTravado;
   RgCompilacao.Enabled := not PTravado;
-  BtnAdicionarVersao.Enabled := not PTravado;
-  BtnRemoverVersao.Enabled := not PTravado;
-  BtnLimparVersoes.Enabled := not PTravado;
-
-  LbxVersoes.Enabled := ((not PTravado) and (RgCompilacao.ItemIndex = RgCompilacao.Items.IndexOf(COMPILACAO_BRANCH))) or
-  ((not PTravado) and (RgCompilacao.ItemIndex = RgCompilacao.Items.IndexOf(COMPILACAO_TRUNK)) and (FSistemaEscolhido = SISTEMA_PDV_Alterdata));
-
+  RgDiretório.Enabled := not PTravado;
   BtnAtualizar.Enabled := not PTravado;
+
+  if (FCompilacaoEscolhida = COMPILACAO_TRUNK) and
+   ((FSistemaEscolhido = SISTEMA_ISHOP_WSHOP) or (FSistemaEscolhido = SISTEMA_SHOP_SIMPLES))then
+  begin
+    BtnAdicionarVersao.Enabled := False;
+    BtnRemoverVersao.Enabled := False;
+    BtnLimparVersoes.Enabled := False;
+    LbxVersoes.Enabled := False;
+  end
+  else
+  begin
+    BtnAdicionarVersao.Enabled := not PTravado;;
+    BtnRemoverVersao.Enabled := not PTravado;
+    BtnLimparVersoes.Enabled := not PTravado;
+    LbxVersoes.Enabled := not PTravado;
+  end;
 end;
+
 
 procedure TFrmPrincipal.AdicionarLog(const PLinha: string);
 begin
@@ -378,7 +441,14 @@ begin
             else
               Delete(LLinhaPendente, 1, LPos);
 
-            if LTextoRestante <> '' then
+            if LTextoRestante = '' then
+            begin
+              // Linha em branco (echo. do .bat) — sempre adiciona, sem passar pelo filtro de %
+              AdicionarLog(LTextoRestante);
+              LUltimoPercentual := -1;
+              LMemoAlterado := True;
+            end
+            else
             begin
               LPercentualAtual := ExtrairPercentual(LTextoRestante);
 
@@ -386,19 +456,17 @@ begin
                  (Pos('%', mmoMemoLog.Lines[mmoMemoLog.Lines.Count - 1]) > 0) and
                  (LPercentualAtual >= 0) then
               begin
-                // Continuação da barra de progresso: só redesenha a cada 5% (ou ao concluir 100%)
                 if (LUltimoPercentual < 0) or (LPercentualAtual - LUltimoPercentual >= 5) or (LPercentualAtual >= 100) then
                 begin
                   mmoMemoLog.Lines[mmoMemoLog.Lines.Count - 1] := LTextoRestante;
                   LUltimoPercentual := LPercentualAtual;
                   LMemoAlterado := True;
                 end;
-                // senão, ignora silenciosamente (não redesenha, evita o flicker)
               end
               else
               begin
                 AdicionarLog(LTextoRestante);
-                LUltimoPercentual := LPercentualAtual; // -1 se não for linha de progresso
+                LUltimoPercentual := LPercentualAtual;
                 LMemoAlterado := True;
               end;
             end;
@@ -491,17 +559,32 @@ begin
      (LNomeVersao <> 'Trunk') then
   begin
     LNomeVersao := PREFIXO_WSHOP + '_' + LNomeVersao;
-  end
-  else if (FCompilacaoEscolhida = COMPILACAO_BRANCH) then
-  begin
-    try
-      LNumeroVersao := TFuncoes.ExtrairVersao(LNomeVersao);
-    except
-      on E: Exception do
+  end;
+
+  try
+    if FGravarEmDiretoriosOriginais then
+      LNumeroVersao := EmptyStr
+    else
+    begin
+      if (Trim(LNomeVersao) = EmptyStr) then
       begin
-        MessageBox(Self.Handle, PChar(E.Message), 'Atualizar', MB_OK or MB_ICONERROR);
-        Exit;
+        LNumeroVersao := COMPILACAO_TRUNK;
+        LNomeVersao := COMPILACAO_TRUNK;
+      end
+      else
+      begin
+        if (FSistemaEscolhido = SISTEMA_PDV_Alterdata) and (FCompilacaoEscolhida = COMPILACAO_TRUNK) and
+          (LNomeVersao = COMPILACAO_TRUNK) then
+          LNumeroVersao := COMPILACAO_TRUNK
+        else
+          LNumeroVersao := TFuncoes.ExtrairVersao(LNomeVersao);
       end;
+    end;
+  except
+    on E: Exception do
+    begin
+      MessageBox(Self.Handle, PChar(E.Message), 'Atualizar', MB_OK or MB_ICONERROR);
+      Exit;
     end;
   end;
 
