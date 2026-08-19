@@ -43,6 +43,7 @@ for %%P in (
     AltShopProc_AtualizarDocNFeWshop.exe
     AltShopProc_AuditorEventos.exe
     AltShopProc_CadastroProdutos.exe
+	AltShopProc_ControleEntregas_Expedicao.exe
     altshopproc_financeiro.exe
     altshopproc_movestoqueotimizado.exe
     AltShop_AgenteTerminalPreVenda.exe

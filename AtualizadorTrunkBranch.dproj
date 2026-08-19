@@ -87,6 +87,7 @@
         <AppDPIAwarenessMode>none</AppDPIAwarenessMode>
         <DCC_DcuOutput>.\dcus</DCC_DcuOutput>
         <PostBuildEvent><![CDATA[copy "$(PROJECTDIR)\Support\Bats\*.bat" "$(OUTPUTDIR)" /Y
+copy "$(PROJECTDIR)\Support\Dlls\*.dll" "$(OUTPUTDIR)" /Y
 $(PostBuildEvent)]]></PostBuildEvent>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_Win64)'!=''">
@@ -103,6 +104,7 @@ $(PostBuildEvent)]]></PostBuildEvent>
         <AppExecutionLevel>requireAdministrator</AppExecutionLevel>
         <DCC_DcuOutput>.\dcus</DCC_DcuOutput>
         <PostBuildEvent><![CDATA[copy "$(PROJECTDIR)\Support\Bats\*.bat" "$(OUTPUTDIR)" /Y
+copy "$(PROJECTDIR)\Support\Dlls\*.dll" "$(OUTPUTDIR)" /Y
 $(PostBuildEvent)]]></PostBuildEvent>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1)'!=''">
@@ -161,11 +163,17 @@ $(PostBuildEvent)]]></PostBuildEvent>
             <FormType>dfm</FormType>
             <DesignClass>TDataModule</DesignClass>
         </DCCReference>
-        <DCCReference Include="src\View\View.Branches.pas">
-            <Form>FrmBranches</Form>
+        <DCCReference Include="src\View\View.Versoes.pas">
+            <Form>FrmVersoes</Form>
             <FormType>dfm</FormType>
         </DCCReference>
-        <DCCReference Include="src\Resource\Utils.Funcoes.pas"/>
+        <DCCReference Include="src\Repository\Repository.Atualizador.pas"/>
+        <DCCReference Include="src\Service\Service.Atualizador.pas"/>
+        <DCCReference Include="src\Model\Model.Atualizador.pas"/>
+        <DCCReference Include="src\View\View.Funcoes.pas">
+            <Form>FrmFuncoes</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
@@ -257,6 +265,12 @@ $(PostBuildEvent)]]></PostBuildEvent>
                 <DeployFile LocalName="Win64\Debug\AtualizadorTrunkBranch.exe" Configuration="Debug" Class="ProjectOutput">
                     <Platform Name="Win64">
                         <RemoteName>AtualizadorTrunkBranch.exe</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="Win64\Debug\AtualizadorTrunkBranch.rsm" Configuration="Debug" Class="DebugSymbols">
+                    <Platform Name="Win64">
+                        <RemoteName>AtualizadorTrunkBranch.rsm</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
@@ -1232,7 +1246,7 @@ $(PostBuildEvent)]]></PostBuildEvent>
         <PreBuildEventIgnoreExitCode>False</PreBuildEventIgnoreExitCode>
         <PreLinkEvent/>
         <PreLinkEventIgnoreExitCode>False</PreLinkEventIgnoreExitCode>
-        <PostBuildEvent>copy &quot;$(PROJECTDIR)\Support\Bats\*.bat&quot; &quot;$(OUTPUTDIR)&quot; /Y</PostBuildEvent>
+        <PostBuildEvent>copy &quot;$(PROJECTDIR)\Support\Bats\*.bat&quot; &quot;$(OUTPUTDIR)&quot; /Y&amp;&amp;copy &quot;$(PROJECTDIR)\Support\Dlls\*.dll&quot; &quot;$(OUTPUTDIR)&quot; /Y</PostBuildEvent>
         <PostBuildEventIgnoreExitCode>False</PostBuildEventIgnoreExitCode>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Config)'=='Debug' And '$(Platform)'=='Win64'">
@@ -1240,7 +1254,7 @@ $(PostBuildEvent)]]></PostBuildEvent>
         <PreBuildEventIgnoreExitCode>False</PreBuildEventIgnoreExitCode>
         <PreLinkEvent/>
         <PreLinkEventIgnoreExitCode>False</PreLinkEventIgnoreExitCode>
-        <PostBuildEvent>copy &quot;$(PROJECTDIR)\Support\Bats\*.bat&quot; &quot;$(OUTPUTDIR)&quot; /Y</PostBuildEvent>
+        <PostBuildEvent>copy &quot;$(PROJECTDIR)\Support\Bats\*.bat&quot; &quot;$(OUTPUTDIR)&quot; /Y&amp;&amp;copy &quot;$(PROJECTDIR)\Support\Dlls\*.dll&quot; &quot;$(OUTPUTDIR)&quot; /Y</PostBuildEvent>
         <PostBuildEventIgnoreExitCode>False</PostBuildEventIgnoreExitCode>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Config)'=='Release' And '$(Platform)'=='Win32'">
@@ -1248,7 +1262,7 @@ $(PostBuildEvent)]]></PostBuildEvent>
         <PreBuildEventIgnoreExitCode>False</PreBuildEventIgnoreExitCode>
         <PreLinkEvent/>
         <PreLinkEventIgnoreExitCode>False</PreLinkEventIgnoreExitCode>
-        <PostBuildEvent>copy &quot;$(PROJECTDIR)\Support\Bats\*.bat&quot; &quot;$(OUTPUTDIR)&quot; /Y</PostBuildEvent>
+        <PostBuildEvent>copy &quot;$(PROJECTDIR)\Support\Bats\*.bat&quot; &quot;$(OUTPUTDIR)&quot; /Y&amp;&amp;copy &quot;$(PROJECTDIR)\Support\Dlls\*.dll&quot; &quot;$(OUTPUTDIR)&quot; /Y</PostBuildEvent>
         <PostBuildEventIgnoreExitCode>False</PostBuildEventIgnoreExitCode>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Config)'=='Release' And '$(Platform)'=='Win64'">
@@ -1256,7 +1270,7 @@ $(PostBuildEvent)]]></PostBuildEvent>
         <PreBuildEventIgnoreExitCode>False</PreBuildEventIgnoreExitCode>
         <PreLinkEvent/>
         <PreLinkEventIgnoreExitCode>False</PreLinkEventIgnoreExitCode>
-        <PostBuildEvent>copy &quot;$(PROJECTDIR)\Support\Bats\*.bat&quot; &quot;$(OUTPUTDIR)&quot; /Y</PostBuildEvent>
+        <PostBuildEvent>copy &quot;$(PROJECTDIR)\Support\Bats\*.bat&quot; &quot;$(OUTPUTDIR)&quot; /Y&amp;&amp;copy &quot;$(PROJECTDIR)\Support\Dlls\*.dll&quot; &quot;$(OUTPUTDIR)&quot; /Y</PostBuildEvent>
         <PostBuildEventIgnoreExitCode>False</PostBuildEventIgnoreExitCode>
     </PropertyGroup>
 </Project>

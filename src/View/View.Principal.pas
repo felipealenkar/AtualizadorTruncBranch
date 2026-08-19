@@ -3,7 +3,8 @@ unit View.Principal;
 interface
 
 uses
-  Dm.Imagens, System.IniFiles, System.IOUtils,
+  Dm.Imagens, Repository.Atualizador,
+  Service.Atualizador,
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ExtCtrls,
   System.ImageList, System.Types, Vcl.ImgList, Vcl.VirtualImageList;
@@ -25,6 +26,7 @@ type
     BtnLimparVersoes: TButton;
     LbxVersoes: TListBox;
     RgDiretório: TRadioGroup;
+    BtnFuncoes: TButton;
     procedure BtnAtualizarClick(Sender: TObject);
     procedure RgCompilacaoClick(Sender: TObject);
     procedure FormShow(Sender: TObject);
@@ -33,7 +35,13 @@ type
     procedure BtnRemoverVersaoClick(Sender: TObject);
     procedure BtnLimparVersoesClick(Sender: TObject);
     procedure RgDiretórioClick(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
+    procedure FormDestroy(Sender: TObject);
+    procedure BtnFuncoesClick(Sender: TObject);
   private
+    FAtualizadorService: TAtualizadorService;
+    FAtualizadorRepository: TAtualizadorRepository;
+
     FSistemaEscolhido: string;
     FCompilacaoEscolhida: string;
     FNomeArquivoBat: string;
@@ -41,11 +49,7 @@ type
     FGravarEmDiretoriosOriginais: Boolean;
 
     procedure AdicionarLog(const PLinha: string);
-    procedure CarregarVersoesFavoritas(PTipoVersao: string);
-    function LerConfiguracoes(PSecao, PChave: string; PPadrao: Boolean = False): Boolean;
     procedure ExecutarBat(const PCaminhoBat: string; const PNomeBranch: string = ''; const PVersaoBranch: string = '');
-    procedure GravarVersoesFavoritas(PTipoBranch: string);
-    procedure GravarConfiguracoes(PSecao, PChave: string; PValor: Boolean);
     procedure IniciarComponentesVisuais;
     procedure ModificarComponentes;
     procedure TravarUI(PTravado: Boolean);
@@ -57,80 +61,31 @@ type
 var
   FrmPrincipal: TFrmPrincipal;
 
-const
-  BAT_ENCERRA_PROC: string = 'EncerraProc.bat';
-
-  BAT_TRUNK_SHOP: string = 'TrunkShop.bat';
-  BAT_TRUNK_SHOP_SIMPLES: string = 'TrunkShopSimples.bat';
-  BAT_TRUNK_PDV: string = 'TrunkPDV.bat';
-
-  BAT_BRANCH_SHOP: string = 'BranchShop.bat';
-  BAT_BRANCH_SHOP_SIMPLES: string = 'BranchShopSimples.bat';
-  BAT_BRANCH_PDV: string = 'BranchPDV.bat';
-
-  BRANCHES_FAVORITAS_SHOP: string = 'BRANCHES_SHOP';
-  BRANCHES_FAVORITAS_PDV: string = 'BRANCHES_PDV';
-  LIBS_FAVORITAS_SHOP_PDV: string = 'LIBS_PDV';
-
-  SISTEMA_ISHOP_WSHOP: string = 'Ishop/WShop';
-  SISTEMA_SHOP_SIMPLES: string = 'Shop Simples';
-  SISTEMA_PDV_Alterdata: string = 'PDV Alterdata';
-
-  PREFIXO_WSHOP: string = 'WSHOP';
-  PREFIXO_PDV: string = 'PDV';
-
-  COMPILACAO_TRUNK: string = 'Trunk';
-  COMPILACAO_BRANCH: string = 'Branch';
-
-  DIRETORIO_BRANCHES: string = 'G:\ALTERDAT\Versoes\wshop\Hudson\branches\';
-  //DIRETORIO_BRANCHES: string = 'C:\Projects\AtualizadorTrunkBranch\Win64\Debug';
-
 implementation
 
 uses
-  Utils.Funcoes,
-  View.Branches;
+  Model.Atualizador,
+  View.Funcoes, View.Versoes;
 
 {$R *.dfm}
+
+procedure TFrmPrincipal.FormCreate(Sender: TObject);
+begin
+  FAtualizadorService := TAtualizadorService.Create;
+  FAtualizadorRepository := TAtualizadorRepository.Create;
+end;
+
+procedure TFrmPrincipal.FormDestroy(Sender: TObject);
+begin
+  FreeAndNil(FAtualizadorRepository);
+  FreeAndNil(FAtualizadorService);
+end;
 
 procedure TFrmPrincipal.FormShow(Sender: TObject);
 begin
   IniciarComponentesVisuais;
 end;
 
-procedure TFrmPrincipal.GravarConfiguracoes(PSecao, PChave: string; PValor: Boolean);
-var
-  LArquivoIni: TIniFile;
-  LCaminhoIni: string;
-begin
-  LCaminhoIni := TPath.Combine(TPath.GetDirectoryName(ParamStr(0)), 'VersoesFavoritas.ini');
-  LArquivoIni := nil;
-  try
-    LArquivoIni := TIniFile.Create(LCaminhoIni);
-    LArquivoIni.WriteBool(PSecao, PChave, PValor);
-  finally
-    LArquivoIni.Free;
-  end;
-end;
-
-procedure TFrmPrincipal.GravarVersoesFavoritas(PTipoBranch: string);
-var
-  LArquivoIni: TIniFile;
-  LCaminhoIni: string;
-  I: Integer;
-begin
-  LCaminhoIni := TPath.Combine(TPath.GetDirectoryName(ParamStr(0)), 'VersoesFavoritas.ini');
-  LArquivoIni := nil;
-  try
-    LArquivoIni := TIniFile.Create(LCaminhoIni);
-    LArquivoIni.EraseSection(PTipoBranch);
-
-    for I := 0 to LbxVersoes.Items.Count -1 do
-      LArquivoIni.WriteString(PTipoBranch, COMPILACAO_BRANCH + '_' + I.ToString, LbxVersoes.Items.Strings[I]);
-  finally
-    LArquivoIni.Free;
-  end;
-end;
 
 procedure TFrmPrincipal.IniciarComponentesVisuais;
 begin
@@ -141,7 +96,7 @@ begin
   CbbSistema.ItemIndex := CbbSistema.Items.IndexOf(SISTEMA_ISHOP_WSHOP);
   FSistemaEscolhido := CbbSistema.Items.Strings[CbbSistema.ItemIndex];
   FCompilacaoEscolhida := RgCompilacao.Items.Strings[RgCompilacao.ItemIndex];
-  FGravarEmDiretoriosOriginais := LerConfiguracoes('CONFIGURACOES', 'GRAVAR_EM_DIRETORIOS_ORIGINAIS');
+  FGravarEmDiretoriosOriginais := FAtualizadorRepository.CarregarConfiguracoes(CONFIGURACOES, GRAVAR_EM_DIRETORIOS_ORIGINAIS);
 
   case FGravarEmDiretoriosOriginais of
     True: RgDiretório.ItemIndex := 0;
@@ -149,21 +104,6 @@ begin
   end;
   ModificarComponentes;
   mmoMemoLog.Clear;
-end;
-
-function TFrmPrincipal.LerConfiguracoes(PSecao, PChave: string; PPadrao: Boolean): Boolean;
-var
-  LArquivoIni: TIniFile;
-  LCaminhoIni: string;
-begin
-  LCaminhoIni := TPath.Combine(TPath.GetDirectoryName(ParamStr(0)), 'VersoesFavoritas.ini');
-  LArquivoIni := nil;
-  try
-    LArquivoIni := TIniFile.Create(LCaminhoIni);
-    Result := LArquivoIni.ReadBool(PSecao, PChave, PPadrao);
-  finally
-    LArquivoIni.Free;
-  end;
 end;
 
 procedure TFrmPrincipal.ModificarComponentes;
@@ -207,7 +147,7 @@ begin
       LbxVersoes.ItemIndex := -1;
       FNomeArquivoBat := BAT_TRUNK_PDV;
       FBuscaVersoes := PREFIXO_WSHOP; //Aqui é Wshop pois queremos a versão da Lib do Wshop mesmo
-      CarregarVersoesFavoritas(LIBS_FAVORITAS_SHOP_PDV);
+      FAtualizadorRepository.CarregarVersoesFavoritas(LIBS_FAVORITAS_SHOP_PDV, LbxVersoes.Items);
     end;
   end
   else if RgCompilacao.ItemIndex = RgCompilacao.Items.IndexOf(COMPILACAO_BRANCH) then
@@ -223,19 +163,19 @@ begin
     begin
       FNomeArquivoBat := BAT_BRANCH_SHOP;
       FBuscaVersoes := PREFIXO_WSHOP;
-      CarregarVersoesFavoritas(BRANCHES_FAVORITAS_SHOP);
+      FAtualizadorRepository.CarregarVersoesFavoritas(BRANCHES_FAVORITAS_SHOP, LbxVersoes.Items);
     end
     else if FSistemaEscolhido = SISTEMA_SHOP_SIMPLES then
     begin
       FNomeArquivoBat := BAT_BRANCH_SHOP_SIMPLES;
       FBuscaVersoes := PREFIXO_WSHOP;
-      CarregarVersoesFavoritas(BRANCHES_FAVORITAS_SHOP);
+      FAtualizadorRepository.CarregarVersoesFavoritas(BRANCHES_FAVORITAS_SHOP, LbxVersoes.Items);
     end
     else if FSistemaEscolhido = SISTEMA_PDV_Alterdata then
     begin
       FNomeArquivoBat := BAT_BRANCH_PDV;
       FBuscaVersoes := PREFIXO_PDV;
-      CarregarVersoesFavoritas(BRANCHES_FAVORITAS_PDV);
+      FAtualizadorRepository.CarregarVersoesFavoritas(BRANCHES_FAVORITAS_PDV, LbxVersoes.Items);
     end;
   end;
 end;
@@ -252,7 +192,7 @@ begin
     0: FGravarEmDiretoriosOriginais := True;
     1: FGravarEmDiretoriosOriginais := False;
   end;
-  GravarConfiguracoes('CONFIGURACOES', 'GRAVAR_EM_DIRETORIOS_ORIGINAIS', FGravarEmDiretoriosOriginais);
+  FAtualizadorRepository.GravarConfiguracoes(CONFIGURACOES, GRAVAR_EM_DIRETORIOS_ORIGINAIS, FGravarEmDiretoriosOriginais);
   ModificarComponentes;
 end;
 
@@ -293,6 +233,7 @@ begin
   RgCompilacao.Enabled := not PTravado;
   RgDiretório.Enabled := not PTravado;
   BtnAtualizar.Enabled := not PTravado;
+  BtnFuncoes.Enabled := not PTravado;
 
   if (FCompilacaoEscolhida = COMPILACAO_TRUNK) and
    ((FSistemaEscolhido = SISTEMA_ISHOP_WSHOP) or (FSistemaEscolhido = SISTEMA_SHOP_SIMPLES))then
@@ -512,33 +453,33 @@ end;
 
 procedure TFrmPrincipal.BtnAdicionarVersaoClick(Sender: TObject);
 var
-  LFrmBranches: TFrmBranches;
+  LFrmVersoes: TFrmVersoes;
   I: Integer;
 begin
-  LFrmBranches := nil;
+  LFrmVersoes := nil;
   try
-    LFrmBranches := TFrmBranches.Create(nil);
-    LFrmBranches.CarregarVersoes(DIRETORIO_BRANCHES, FBuscaVersoes, FCompilacaoEscolhida);
-    LFrmBranches.ShowModal;
+    LFrmVersoes := TFrmVersoes.Create(FAtualizadorService);
+    LFrmVersoes.CarregarVersoes(DIRETORIO_BRANCHES, FBuscaVersoes, FCompilacaoEscolhida);
+    LFrmVersoes.ShowModal;
 
-    for I := 0 to LFrmBranches.ListaVersoesSelecionadas.Count -1 do
+    for I := 0 to LFrmVersoes.ListaVersoesSelecionadas.Count -1 do
     begin
-      if LbxVersoes.Items.IndexOf(LFrmBranches.ListaVersoesSelecionadas[I]) = -1 then
-        LbxVersoes.Items.Add(LFrmBranches.ListaVersoesSelecionadas[I]);
+      if LbxVersoes.Items.IndexOf(LFrmVersoes.ListaVersoesSelecionadas[I]) = -1 then
+        LbxVersoes.Items.Add(LFrmVersoes.ListaVersoesSelecionadas[I]);
     end;
 
     if (FSistemaEscolhido = SISTEMA_ISHOP_WSHOP) or (FSistemaEscolhido = SISTEMA_SHOP_SIMPLES) then
-      GravarVersoesFavoritas(BRANCHES_FAVORITAS_SHOP)
+      FAtualizadorRepository.GravarVersoesFavoritas(BRANCHES_FAVORITAS_SHOP, COMPILACAO_BRANCH, LbxVersoes.Items)
     else if FSistemaEscolhido = SISTEMA_PDV_Alterdata then
     begin
       if FCompilacaoEscolhida = COMPILACAO_TRUNK then
-        GravarVersoesFavoritas(LIBS_FAVORITAS_SHOP_PDV)
+        FAtualizadorRepository.GravarVersoesFavoritas(LIBS_FAVORITAS_SHOP_PDV, COMPILACAO_BRANCH, LbxVersoes.Items)
       else if FCompilacaoEscolhida = COMPILACAO_BRANCH then
-        GravarVersoesFavoritas(BRANCHES_FAVORITAS_PDV);
+        FAtualizadorRepository.GravarVersoesFavoritas(BRANCHES_FAVORITAS_PDV, COMPILACAO_BRANCH, LbxVersoes.Items);
     end;
   finally
-    if Assigned(LFrmBranches) then
-      FreeAndNil(LFrmBranches);
+    if Assigned(LFrmVersoes) then
+      FreeAndNil(LFrmVersoes);
   end;
 end;
 
@@ -555,31 +496,9 @@ begin
   if LbxVersoes.ItemIndex >= 0 then
     LNomeVersao := LbxVersoes.Items.Strings[LbxVersoes.ItemIndex];
 
-  if (FCompilacaoEscolhida = COMPILACAO_TRUNK) and (FSistemaEscolhido = SISTEMA_PDV_Alterdata) and
-     (LNomeVersao <> 'Trunk') then
-  begin
-    LNomeVersao := PREFIXO_WSHOP + '_' + LNomeVersao;
-  end;
-
   try
-    if FGravarEmDiretoriosOriginais then
-      LNumeroVersao := EmptyStr
-    else
-    begin
-      if (Trim(LNomeVersao) = EmptyStr) then
-      begin
-        LNumeroVersao := COMPILACAO_TRUNK;
-        LNomeVersao := COMPILACAO_TRUNK;
-      end
-      else
-      begin
-        if (FSistemaEscolhido = SISTEMA_PDV_Alterdata) and (FCompilacaoEscolhida = COMPILACAO_TRUNK) and
-          (LNomeVersao = COMPILACAO_TRUNK) then
-          LNumeroVersao := COMPILACAO_TRUNK
-        else
-          LNumeroVersao := TFuncoes.ExtrairVersao(LNomeVersao);
-      end;
-    end;
+    FAtualizadorService.DefinirVersaoParaExecucao(FGravarEmDiretoriosOriginais,
+              FSistemaEscolhido, FCompilacaoEscolhida, LNomeVersao, LNumeroVersao);
   except
     on E: Exception do
     begin
@@ -590,6 +509,19 @@ begin
 
   ExecutarBat(ExtractFilePath(Application.ExeName) + BAT_ENCERRA_PROC);
   ExecutarBat(ExtractFilePath(Application.ExeName) + FNomeArquivoBat, LNomeVersao, LNumeroVersao);
+end;
+
+procedure TFrmPrincipal.BtnFuncoesClick(Sender: TObject);
+var
+  LFrmFuncoes: TFrmFuncoes;
+begin
+  LFrmFuncoes := nil;
+  try
+    LFrmFuncoes := TFrmFuncoes.Create(FAtualizadorRepository);
+    LFrmFuncoes.ShowModal;
+  finally
+    FreeAndNil(LFrmFuncoes);
+  end;
 end;
 
 procedure TFrmPrincipal.BtnLimparVersoesClick(Sender: TObject);
@@ -604,13 +536,13 @@ begin
 
     if (FSistemaEscolhido = SISTEMA_ISHOP_WSHOP) or
        (FSistemaEscolhido = SISTEMA_SHOP_SIMPLES) then
-      GravarVersoesFavoritas(BRANCHES_FAVORITAS_SHOP)
+      FAtualizadorRepository.GravarVersoesFavoritas(BRANCHES_FAVORITAS_SHOP, COMPILACAO_BRANCH, LbxVersoes.Items)
     else if FSistemaEscolhido = SISTEMA_PDV_Alterdata then
     begin
       if FCompilacaoEscolhida = COMPILACAO_TRUNK then
-        GravarVersoesFavoritas(LIBS_FAVORITAS_SHOP_PDV)
+        FAtualizadorRepository.GravarVersoesFavoritas(LIBS_FAVORITAS_SHOP_PDV, COMPILACAO_BRANCH, LbxVersoes.Items)
       else if FCompilacaoEscolhida = COMPILACAO_BRANCH then
-        GravarVersoesFavoritas(BRANCHES_FAVORITAS_PDV);
+        FAtualizadorRepository.GravarVersoesFavoritas(BRANCHES_FAVORITAS_PDV, COMPILACAO_BRANCH, LbxVersoes.Items);
     end;
   end;
 end;
@@ -623,52 +555,14 @@ begin
 
     if (FSistemaEscolhido = SISTEMA_ISHOP_WSHOP) or
        (FSistemaEscolhido = SISTEMA_SHOP_SIMPLES) then
-      GravarVersoesFavoritas(BRANCHES_FAVORITAS_SHOP)
+      FAtualizadorRepository.GravarVersoesFavoritas(BRANCHES_FAVORITAS_SHOP, COMPILACAO_BRANCH, LbxVersoes.Items)
     else if (FSistemaEscolhido = SISTEMA_PDV_Alterdata) then
     begin
       if FCompilacaoEscolhida = COMPILACAO_TRUNK then
-        GravarVersoesFavoritas(LIBS_FAVORITAS_SHOP_PDV)
+        FAtualizadorRepository.GravarVersoesFavoritas(LIBS_FAVORITAS_SHOP_PDV, COMPILACAO_BRANCH, LbxVersoes.Items)
       else if FCompilacaoEscolhida = COMPILACAO_BRANCH then
-        GravarVersoesFavoritas(BRANCHES_FAVORITAS_PDV);
+        FAtualizadorRepository.GravarVersoesFavoritas(BRANCHES_FAVORITAS_PDV, COMPILACAO_BRANCH, LbxVersoes.Items);
     end;
-  end;
-end;
-
-procedure TFrmPrincipal.CarregarVersoesFavoritas(PTipoVersao: string);
-var
-  LArquivoIni: TIniFile;
-  LCaminhoIni: string;
-  LListaBranches: TStringList;
-  I: Integer;
-  LValorBranch: string;
-begin
-  LCaminhoIni := TPath.Combine(TPath.GetDirectoryName(ParamStr(0)), 'VersoesFavoritas.ini');
-
-  if not TFile.Exists(LCaminhoIni) then
-  begin
-    Exit;
-  end;
-
-  LArquivoIni := nil;
-  LListaBranches := nil;
-  try
-    LListaBranches := TStringList.Create;
-    LArquivoIni := TIniFile.Create(LCaminhoIni);
-
-    LbxVersoes.Items.Clear;
-    LArquivoIni.ReadSectionValues(PTipoVersao, LListaBranches);
-
-    for I := 0 to LListaBranches.Count - 1 do
-    begin
-      // LValores.ValueFromIndex[I] pega diretamente o valor após o '='
-      LValorBranch := LListaBranches.ValueFromIndex[I];
-
-      if LValorBranch <> EmptyStr then
-        LbxVersoes.Items.Add(LValorBranch);
-    end;
-  finally
-    LListaBranches.Free;
-    LArquivoIni.Free;
   end;
 end;
 
@@ -682,14 +576,14 @@ begin
     if RgCompilacao.Items.Strings[RgCompilacao.ItemIndex] = COMPILACAO_TRUNK then
       LbxVersoes.Items.Clear
     else if RgCompilacao.Items.Strings[RgCompilacao.ItemIndex] = COMPILACAO_BRANCH then
-      CarregarVersoesFavoritas(BRANCHES_FAVORITAS_SHOP);
+      FAtualizadorRepository.CarregarVersoesFavoritas(BRANCHES_FAVORITAS_SHOP, LbxVersoes.Items);
   end
   else if FSistemaEscolhido = SISTEMA_PDV_Alterdata then
   begin
     if RgCompilacao.Items.Strings[RgCompilacao.ItemIndex] = COMPILACAO_TRUNK then
-      CarregarVersoesFavoritas(LIBS_FAVORITAS_SHOP_PDV)
+      FAtualizadorRepository.CarregarVersoesFavoritas(LIBS_FAVORITAS_SHOP_PDV, LbxVersoes.Items)
     else if RgCompilacao.Items.Strings[RgCompilacao.ItemIndex] = COMPILACAO_BRANCH then
-      CarregarVersoesFavoritas(BRANCHES_FAVORITAS_PDV);
+      FAtualizadorRepository.CarregarVersoesFavoritas(BRANCHES_FAVORITAS_PDV, LbxVersoes.Items);
   end;
 
   ModificarComponentes;

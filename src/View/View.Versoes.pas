@@ -1,39 +1,43 @@
-unit View.Branches;
+unit View.Versoes;
 
 interface
 
 uses
+  Service.Atualizador, Dm.Imagens,
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ExtCtrls, Vcl.CheckLst;
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ExtCtrls, Vcl.CheckLst,
+  System.ImageList, Vcl.ImgList, Vcl.VirtualImageList;
 
 type
-  TFrmBranches = class(TForm)
+  TFrmVersoes = class(TForm)
     PnlLista: TPanel;
     chklstBranches: TCheckListBox;
     PnlBotoes: TPanel;
     BtnConcluir: TButton;
+    VImgLBotoes: TVirtualImageList;
     procedure chklstBranchesDblClick(Sender: TObject);
     procedure BtnConcluirClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
   private
+    FAtualizadorService: TAtualizadorService;
     function ListarPastasRaiz(const PPasta, PSistema, PCompilacao: string): TStringList;
   public
     ListaVersoesSelecionadas: TStringList;
+
+    constructor Create(PAtualizadorService: TAtualizadorService); reintroduce;
     procedure CarregarVersoes(PDiretorio, PSistema, PCompilacao: string);
   end;
 
 implementation
 
 uses
-  System.IOUtils, System.StrUtils,
-  Utils.Funcoes;
-
+  System.IOUtils, System.StrUtils;
 {$R *.dfm}
 
 { TFrmBranches }
 
-procedure TFrmBranches.BtnConcluirClick(Sender: TObject);
+procedure TFrmVersoes.BtnConcluirClick(Sender: TObject);
 var
   I: Integer;
 begin
@@ -45,7 +49,7 @@ begin
   ModalResult := mrOk;
 end;
 
-procedure TFrmBranches.CarregarVersoes(PDiretorio, PSistema, PCompilacao: string);
+procedure TFrmVersoes.CarregarVersoes(PDiretorio, PSistema, PCompilacao: string);
 var
   LListaPastas: TStringList;
 begin
@@ -59,7 +63,7 @@ begin
   end;
 end;
 
-procedure TFrmBranches.chklstBranchesDblClick(Sender: TObject);
+procedure TFrmVersoes.chklstBranchesDblClick(Sender: TObject);
 var
   ClickPos: TPoint;
   Index: Integer;
@@ -73,45 +77,38 @@ begin
   end;
 end;
 
-procedure TFrmBranches.FormCreate(Sender: TObject);
+constructor TFrmVersoes.Create(PAtualizadorService: TAtualizadorService);
+begin
+  inherited Create(nil);
+  FAtualizadorService := PAtualizadorService;
+end;
+
+procedure TFrmVersoes.FormCreate(Sender: TObject);
 begin
   ListaVersoesSelecionadas := TStringList.Create;
 end;
 
-procedure TFrmBranches.FormDestroy(Sender: TObject);
+procedure TFrmVersoes.FormDestroy(Sender: TObject);
 begin
   ListaVersoesSelecionadas.Free;
 end;
 
-function TFrmBranches.ListarPastasRaiz(const PPasta, PSistema, PCompilacao: string): TStringList;
+function TFrmVersoes.ListarPastasRaiz(const PPasta, PSistema, PCompilacao: string): TStringList;
 var
   Pastas: TArray<string>;
+  LNomesPastas: TStringList;
   Pasta: string;
 begin
-  Result := TStringList.Create;
-  Pastas := TDirectory.GetDirectories(PPasta, PSistema + '*', TSearchOption.soTopDirectoryOnly);
+  LNomesPastas := nil;
+  try
+    LNomesPastas := TStringList.Create;
+    Pastas := TDirectory.GetDirectories(PPasta, PSistema + '*', TSearchOption.soTopDirectoryOnly);
+    for Pasta in Pastas do
+      LNomesPastas.Add(ExtractFileName(Pasta));
 
-  for Pasta in Pastas do
-  begin
-     if PCompilacao = 'Trunk' then
-    begin
-      if StartsText('WSHOP_', ExtractFileName(Pasta)) then
-      begin
-        var LVersaoExtraida: string := StringReplace(TFuncoes.ExtrairVersao(ExtractFileName(Pasta)), 'WSHOP_', EmptyStr, [rfReplaceAll, rfIgnoreCase]);
-
-        if Result.IndexOf(LVersaoExtraida) = -1 then
-          Result.Add(LVersaoExtraida);
-      end;
-    end
-    else
-      Result.Add(ExtractFileName(Pasta));
-  end;
-
-  if PCompilacao = 'Trunk' then
-  begin
-    if not Result.Contains('Trunk') then
-      Result.Add('Trunk');
+    Result := FAtualizadorService.FiltrarVersoesDisponiveis(LNomesPastas, PCompilacao);
+  finally
+    LNomesPastas.Free;
   end;
 end;
-
 end.

@@ -5,7 +5,7 @@
   BorderIcons = [biSystemMenu, biMinimize]
   BorderStyle = bsSingle
   Caption = 'Atualizador Trunk/Branch'
-  ClientHeight = 717
+  ClientHeight = 693
   ClientWidth = 1454
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -8465,26 +8465,27 @@
     FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
     FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF}
   Position = poScreenCenter
+  OnCreate = FormCreate
+  OnDestroy = FormDestroy
   OnShow = FormShow
   TextHeight = 15
   object PnlFiltros: TPanel
     Left = 0
     Top = 0
     Width = 353
-    Height = 717
+    Height = 693
     Align = alLeft
     TabOrder = 0
     DesignSize = (
       353
-      717)
+      693)
     object LblSistema: TLabel
       Left = 7
       Top = 9
-      Width = 52
+      Width = 41
       Height = 15
       Anchors = [akLeft, akTop, akRight]
       Caption = 'Sistema'
-      ExplicitWidth = 41
     end
     object CbbSistema: TComboBox
       Left = 6
@@ -8495,13 +8496,12 @@
       Anchors = [akLeft, akTop, akRight]
       TabOrder = 0
       OnChange = CbbSistemaChange
-      ExplicitWidth = 330
     end
     object BtnAtualizar: TButton
-      Left = 107
-      Top = 620
-      Width = 135
-      Height = 81
+      Left = 52
+      Top = 619
+      Width = 122
+      Height = 59
       Anchors = [akLeft, akBottom]
       Caption = 'Atualizar'
       ImageIndex = 0
@@ -8524,7 +8524,6 @@
         'Branch')
       TabOrder = 2
       OnClick = RgCompilacaoClick
-      ExplicitWidth = 330
     end
     object GrpVersoes: TGroupBox
       Left = 6
@@ -8594,7 +8593,6 @@
         ItemHeight = 15
         Sorted = True
         TabOrder = 3
-        ExplicitWidth = 237
       end
     end
     object RgDiretório: TRadioGroup
@@ -8609,24 +8607,38 @@
         'Personalizados (Shop X.XXXX.X, biblioteca X.XXXX.X, etc...)')
       TabOrder = 4
       OnClick = RgDiretórioClick
-      ExplicitWidth = 330
+    end
+    object BtnFuncoes: TButton
+      Left = 180
+      Top = 619
+      Width = 122
+      Height = 59
+      Anchors = [akLeft, akBottom]
+      BiDiMode = bdLeftToRight
+      Caption = 'Fun'#231#245'es'
+      ImageIndex = 1
+      ImageName = 'ManutencaoBD'
+      ImageMargins.Left = 5
+      Images = VImgLImagens
+      ParentBiDiMode = False
+      TabOrder = 5
+      WordWrap = True
+      OnClick = BtnFuncoesClick
     end
   end
   object PnlLog: TPanel
     Left = 353
     Top = 0
     Width = 1101
-    Height = 717
+    Height = 693
     Align = alClient
     TabOrder = 1
-    ExplicitLeft = 342
-    ExplicitWidth = 1112
     object mmoMemoLog: TMemo
       AlignWithMargins = True
       Left = 14
       Top = 14
       Width = 1073
-      Height = 689
+      Height = 665
       Margins.Left = 13
       Margins.Top = 13
       Margins.Right = 13
@@ -8635,8 +8647,6 @@
       ReadOnly = True
       ScrollBars = ssVertical
       TabOrder = 0
-      ExplicitWidth = 1084
-      ExplicitHeight = 587
     end
   end
   object VImgLImagens: TVirtualImageList
@@ -8645,10 +8655,15 @@
         CollectionIndex = 0
         CollectionName = 'Atualizar'
         Name = 'Atualizar'
+      end
+      item
+        CollectionIndex = 6
+        CollectionName = 'ManutencaoBD'
+        Name = 'ManutencaoBD'
       end>
     ImageCollection = DmImagens.ImgColImagens
-    Width = 60
-    Height = 60
+    Width = 45
+    Height = 45
     Left = 408
     Top = 552
   end

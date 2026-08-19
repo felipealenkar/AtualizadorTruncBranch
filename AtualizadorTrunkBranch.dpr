@@ -4,8 +4,11 @@ uses
   Vcl.Forms,
   View.Principal in 'src\View\View.Principal.pas' {FrmPrincipal},
   Dm.Imagens in 'src\DataModule\Dm.Imagens.pas' {DmImagens: TDataModule},
-  View.Branches in 'src\View\View.Branches.pas' {FrmBranches},
-  Utils.Funcoes in 'src\Resource\Utils.Funcoes.pas';
+  View.Versoes in 'src\View\View.Versoes.pas' {FrmVersoes},
+  Repository.Atualizador in 'src\Repository\Repository.Atualizador.pas',
+  Service.Atualizador in 'src\Service\Service.Atualizador.pas',
+  Model.Atualizador in 'src\Model\Model.Atualizador.pas',
+  View.Funcoes in 'src\View\View.Funcoes.pas' {FrmFuncoes};
 
 {$R *.res}
 

@@ -115,7 +115,7 @@ begin
       if not DirExists(sInstallDirNovo) then
         ForceDirectories(sInstallDirNovo);
 
-      FileCopy(sIniAntigo, sIniNovo, False);
+      CopyFile(sIniAntigo, sIniNovo, False);
     end;
 
     // Agora sim, apaga a pasta antiga inteira

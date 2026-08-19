@@ -51,6 +51,7 @@ if "%VERSAO_BRANCH%"=="" (
 
 echo ====================================================================================================
 echo             INICIANDO ATUALIZAÇÃO DA TRUNK PDV
+echo             LIB SHOP COMPATÍVEL: %NOME_LIB%
 echo             DESTINO: %MSG_VERSAO%
 echo ====================================================================================================
 echo.
@@ -210,7 +211,7 @@ echo ---------------------------------------------------------------------------
 echo 📁 Copiando arquivos
 echo Origem: "%ORIGEM4%" 
 echo Destino: "%DESTINO4%"
-robocopy "%ORIGEM4%" "%DESTINO4%" /E /ZB /R:1 /W:2 /NJH /NJS /NDL /XX /FFT /XD "ERP" 
+robocopy "%ORIGEM4%" "%DESTINO4%" /E /ZB /R:1 /W:2 /NJH /NJS /NDL /XX /FFT /XF "AltShop_TrocaOffLine_900.bpl" /XD "ERP" 
 if errorlevel 8 goto ERRO
 
 echo ----------------------------------------------------------------------------------------------------------------------------------------------------------------------
