@@ -4,7 +4,7 @@ object FrmFuncoes: TFrmFuncoes
   BorderIcons = [biSystemMenu]
   BorderStyle = bsSingle
   Caption = 'Fun'#231#245'es'
-  ClientHeight = 437
+  ClientHeight = 529
   ClientWidth = 272
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -2134,22 +2134,23 @@ object FrmFuncoes: TFrmFuncoes
     Left = 0
     Top = 0
     Width = 272
-    Height = 437
+    Height = 529
     Align = alClient
     TabOrder = 0
+    ExplicitHeight = 437
     DesignSize = (
       272
-      437)
+      529)
     object LblInstrucao: TLabel
       Left = 42
-      Top = 110
+      Top = 119
       Width = 137
       Height = 15
       Caption = 'Selecione a base de dados'
     end
     object VimgDb: TVirtualImage
       Left = 8
-      Top = 104
+      Top = 113
       Width = 28
       Height = 25
       ImageCollection = DmImagens.ImgColImagens
@@ -2205,13 +2206,32 @@ object FrmFuncoes: TFrmFuncoes
     end
     object LbxDatabases: TListBox
       Left = 9
-      Top = 135
+      Top = 142
       Width = 254
-      Height = 291
+      Height = 376
       Anchors = [akLeft, akTop, akRight, akBottom]
       ItemHeight = 15
       Sorted = True
       TabOrder = 2
+    end
+    object BtnAlterarVersao: TButton
+      AlignWithMargins = True
+      Left = 142
+      Top = 65
+      Width = 121
+      Height = 48
+      Margins.Left = 8
+      Margins.Top = 8
+      Margins.Right = 8
+      Margins.Bottom = 8
+      Anchors = [akTop, akRight]
+      Caption = 'Alterar vers'#227'o'
+      ImageIndex = 1
+      ImageName = 'AlterarVersao'
+      Images = VImgLBotoes
+      TabOrder = 3
+      WordWrap = True
+      OnClick = Exi
     end
   end
   object VImgLBotoes: TVirtualImageList
@@ -2220,6 +2240,11 @@ object FrmFuncoes: TFrmFuncoes
         CollectionIndex = 4
         CollectionName = 'Modulos'
         Name = 'Modulos'
+      end
+      item
+        CollectionIndex = 8
+        CollectionName = 'AlterarVersao'
+        Name = 'AlterarVersao'
       end>
     ImageCollection = DmImagens.ImgColImagens
     Width = 40

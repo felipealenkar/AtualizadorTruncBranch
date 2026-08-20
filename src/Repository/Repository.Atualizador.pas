@@ -17,6 +17,7 @@ type
     procedure DestruirComponentesDb;
     procedure Conectar(PNomeDatabase: string);
 
+    procedure AlterarVersao(PSistema, PVersao: string);
     function CarregarConfiguracoes(PSecao, PChave: string; PPadrao: Boolean = False): Boolean;
     procedure CarregarVersoesFavoritas(PTipoVersao: string; PListaVersoes: TStrings);
     procedure GravarConfiguracoes(PSecao, PChave: string; PValor: Boolean);
@@ -170,7 +171,13 @@ End;
 
 procedure TAtualizadorRepository.TruncarModulos(PSistema: string);
 begin
-  FConnection.ExecSQL(Format('truncate %s.modulo_%s', [PSistema, PSistema]));
+  FConnection.ExecSQL(Format('TRUNCATE %s.modulo_%s', [PSistema, PSistema]));
+end;
+
+procedure TAtualizadorRepository.AlterarVersao(PSistema, PVersao: string);
+begin
+  FConnection.ExecSQL(Format('UPDATE %s.%s SET value = :PVersao WHERE ident = ''UltimaVersao''',
+  [PSistema, PSistema]), [PVersao]);
 end;
 
 function TAtualizadorRepository.CarregarConfiguracoes(PSecao, PChave: string; PPadrao: Boolean = False): Boolean;
